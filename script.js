@@ -64,8 +64,8 @@ const style = document.createElement('style');
 style.textContent = `
     section {
         opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
     }
     
     section.fade-in {
@@ -74,14 +74,12 @@ style.textContent = `
     }
     
     .nav-links a.active {
-        color: var(--secondary-color);
-        text-shadow: 0 0 8px var(--secondary-color);
-        position: relative;
+        color: var(--primary-color);
+        font-weight: 600;
     }
     
     .nav-links a.active::after {
-        content: ' <';
-        color: var(--secondary-color);
+        width: 100%;
     }
 `;
 document.head.appendChild(style);
