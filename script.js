@@ -1,5 +1,46 @@
 // Smooth scroll behavior for navigation links
 document.addEventListener('DOMContentLoaded', function() {
+    // Custom Cursor Control
+    const cursor = document.querySelector('.custom-cursor');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+
+    // Smooth cursor movement
+    function updateCursor() {
+        cursorX += (mouseX - cursorX) * 0.2;
+        cursorY += (mouseY - cursorY) * 0.2;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        requestAnimationFrame(updateCursor);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    updateCursor();
+
+    // Click effect
+    document.addEventListener('mousedown', () => {
+        cursor.classList.add('clicking');
+    });
+
+    document.addEventListener('mouseup', () => {
+        cursor.classList.remove('clicking');
+    });
+
+    // Hover effects on interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, .btn, .skill-card, .project-card, .contact-item');
+    interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => {
+            cursor.classList.add('hovering');
+        });
+        el.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hovering');
+        });
+    });
+
     // Add smooth scrolling for all anchor links
     const links = document.querySelectorAll('a[href^="#"]');
     

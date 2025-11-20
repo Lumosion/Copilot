@@ -8,21 +8,59 @@
             this.canvas = canvas;
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
+            this.baseX = this.x;
+            this.baseY = this.y;
             this.vx = (Math.random() - 0.5) * 1;
             this.vy = (Math.random() - 0.5) * 1;
             this.radius = Math.random() * 2 + 1;
             this.opacity = Math.random() * 0.5 + 0.3;
+            this.attractionStrength = 0.03;
         }
 
-        update() {
+        update(mouse) {
+            // Mouse attraction effect
+            if (mouse.x !== null && mouse.y !== null) {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < mouse.radius) {
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    const angle = Math.atan2(dy, dx);
+                    this.vx += Math.cos(angle) * force * this.attractionStrength;
+                    this.vy += Math.sin(angle) * force * this.attractionStrength;
+                }
+            }
+
+            // Apply velocity with damping
             this.x += this.vx;
             this.y += this.vy;
+            this.vx *= 0.95;
+            this.vy *= 0.95;
 
-            // Wrap around screen
-            if (this.x < 0) this.x = this.canvas.width;
-            if (this.x > this.canvas.width) this.x = 0;
-            if (this.y < 0) this.y = this.canvas.height;
-            if (this.y > this.canvas.height) this.y = 0;
+            // Gentle drift back to original position
+            const driftX = (this.baseX - this.x) * 0.01;
+            const driftY = (this.baseY - this.y) * 0.01;
+            this.vx += driftX;
+            this.vy += driftY;
+
+            // Wrap around screen and update base position
+            if (this.x < 0) {
+                this.x = this.canvas.width;
+                this.baseX = this.x;
+            }
+            if (this.x > this.canvas.width) {
+                this.x = 0;
+                this.baseX = this.x;
+            }
+            if (this.y < 0) {
+                this.y = this.canvas.height;
+                this.baseY = this.y;
+            }
+            if (this.y > this.canvas.height) {
+                this.y = 0;
+                this.baseY = this.y;
+            }
         }
 
         draw(ctx) {
@@ -47,6 +85,7 @@
             this.particleCount = 80;
             this.maxDistance = 150;
             this.mouse = { x: null, y: null, radius: 150 };
+            this.clickEffect = { active: false, x: 0, y: 0, radius: 0, maxRadius: 100, expanding: true };
 
             this.init();
             this.animate();
@@ -114,14 +153,49 @@
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             this.particles.forEach(particle => {
-                particle.update();
+                particle.update(this.mouse);
                 particle.draw(this.ctx);
             });
 
             this.drawLines();
             this.connectMouse();
+            this.drawClickEffect();
 
             requestAnimationFrame(() => this.animate());
+        }
+
+        drawClickEffect() {
+            if (!this.clickEffect.active) return;
+
+            // Update click effect
+            if (this.clickEffect.expanding) {
+                this.clickEffect.radius += 3;
+                if (this.clickEffect.radius >= this.clickEffect.maxRadius) {
+                    this.clickEffect.expanding = false;
+                }
+            } else {
+                this.clickEffect.radius -= 5;
+                if (this.clickEffect.radius <= 0) {
+                    this.clickEffect.active = false;
+                }
+            }
+
+            // Draw ripple effect
+            const alpha = 1 - (this.clickEffect.radius / this.clickEffect.maxRadius);
+            this.ctx.beginPath();
+            this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius, 0, Math.PI * 2);
+            this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+
+            // Inner ripple
+            if (this.clickEffect.radius > 20) {
+                this.ctx.beginPath();
+                this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius - 20, 0, Math.PI * 2);
+                this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
+                this.ctx.lineWidth = 1;
+                this.ctx.stroke();
+            }
         }
 
         setupEventListeners() {
@@ -130,6 +204,7 @@
                 this.createParticles();
             });
 
+            // Mouse events
             this.canvas.addEventListener('mousemove', (e) => {
                 this.mouse.x = e.x;
                 this.mouse.y = e.y;
@@ -140,15 +215,61 @@
                 this.mouse.y = null;
             });
 
-            this.canvas.addEventListener('click', () => {
-                for (let i = 0; i < 4; i++) {
-                    this.particles.push(new Particle(this.canvas));
-                }
-                // Remove excess particles
-                if (this.particles.length > this.particleCount + 20) {
-                    this.particles.splice(0, 4);
-                }
+            this.canvas.addEventListener('click', (e) => {
+                this.triggerClickEffect(e.x, e.y);
             });
+
+            // Touch events for mobile support
+            this.canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                this.mouse.x = touch.clientX - rect.left;
+                this.mouse.y = touch.clientY - rect.top;
+                this.triggerClickEffect(this.mouse.x, this.mouse.y);
+            }, { passive: false });
+
+            this.canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                this.mouse.x = touch.clientX - rect.left;
+                this.mouse.y = touch.clientY - rect.top;
+            }, { passive: false });
+
+            this.canvas.addEventListener('touchend', () => {
+                this.mouse.x = null;
+                this.mouse.y = null;
+            });
+        }
+
+        triggerClickEffect(x, y) {
+            this.clickEffect = {
+                active: true,
+                x: x,
+                y: y,
+                radius: 0,
+                maxRadius: 100,
+                expanding: true
+            };
+
+            // Create burst of particles at click location
+            for (let i = 0; i < 5; i++) {
+                this.particles.push(new Particle(this.canvas));
+                const lastParticle = this.particles[this.particles.length - 1];
+                lastParticle.x = x;
+                lastParticle.y = y;
+                lastParticle.baseX = x;
+                lastParticle.baseY = y;
+                const angle = (Math.PI * 2 * i) / 5;
+                lastParticle.vx = Math.cos(angle) * 3;
+                lastParticle.vy = Math.sin(angle) * 3;
+            }
+
+            // Remove excess particles
+            if (this.particles.length > this.particleCount + 30) {
+                this.particles.splice(0, 5);
+            }
         }
     }
 
