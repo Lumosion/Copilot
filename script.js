@@ -74,18 +74,14 @@ style.textContent = `
     }
     
     .nav-links a.active {
-        color: var(--primary-color);
+        color: var(--secondary-color);
+        text-shadow: 0 0 8px var(--secondary-color);
         position: relative;
     }
     
     .nav-links a.active::after {
-        content: '';
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: var(--primary-color);
+        content: ' <';
+        color: var(--secondary-color);
     }
 `;
 document.head.appendChild(style);
