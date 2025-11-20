@@ -4,8 +4,9 @@
 
     // Particle class
     class Particle {
-        constructor(canvas) {
+        constructor(canvas, isTextParticle = false) {
             this.canvas = canvas;
+            this.isTextParticle = isTextParticle;
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
             this.baseX = this.x;
@@ -14,7 +15,8 @@
             this.vy = (Math.random() - 0.5) * 1;
             this.radius = Math.random() * 2 + 1;
             this.opacity = Math.random() * 0.5 + 0.3;
-            this.attractionStrength = 0.03;
+            this.attractionStrength = isTextParticle ? 0.05 : 0.03;
+            this.returnSpeed = isTextParticle ? 0.05 : 0.01;
         }
 
         update(mouse) {
@@ -39,27 +41,29 @@
             this.vy *= 0.95;
 
             // Gentle drift back to original position
-            const driftX = (this.baseX - this.x) * 0.01;
-            const driftY = (this.baseY - this.y) * 0.01;
+            const driftX = (this.baseX - this.x) * this.returnSpeed;
+            const driftY = (this.baseY - this.y) * this.returnSpeed;
             this.vx += driftX;
             this.vy += driftY;
 
-            // Wrap around screen and update base position
-            if (this.x < 0) {
-                this.x = this.canvas.width;
-                this.baseX = this.x;
-            }
-            if (this.x > this.canvas.width) {
-                this.x = 0;
-                this.baseX = this.x;
-            }
-            if (this.y < 0) {
-                this.y = this.canvas.height;
-                this.baseY = this.y;
-            }
-            if (this.y > this.canvas.height) {
-                this.y = 0;
-                this.baseY = this.y;
+            // For non-text particles, wrap around screen and update base position
+            if (!this.isTextParticle) {
+                if (this.x < 0) {
+                    this.x = this.canvas.width;
+                    this.baseX = this.x;
+                }
+                if (this.x > this.canvas.width) {
+                    this.x = 0;
+                    this.baseX = this.x;
+                }
+                if (this.y < 0) {
+                    this.y = this.canvas.height;
+                    this.baseY = this.y;
+                }
+                if (this.y > this.canvas.height) {
+                    this.y = 0;
+                    this.baseY = this.y;
+                }
             }
         }
 
@@ -82,6 +86,7 @@
             
             this.ctx = this.canvas.getContext('2d');
             this.particles = [];
+            this.textParticles = [];
             this.particleCount = 80;
             this.maxDistance = 150;
             this.mouse = { x: null, y: null, radius: 150 };
@@ -90,6 +95,7 @@
             this.init();
             this.animate();
             this.setupEventListeners();
+            this.createTextParticles();
         }
 
         init() {
@@ -105,7 +111,51 @@
         createParticles() {
             this.particles = [];
             for (let i = 0; i < this.particleCount; i++) {
-                this.particles.push(new Particle(this.canvas));
+                this.particles.push(new Particle(this.canvas, false));
+            }
+        }
+
+        createTextParticles() {
+            // Create particles for the hero title
+            const text = '开发者';
+            const fontSize = 60;
+            const x = this.canvas.width / 2;
+            const y = this.canvas.height / 2 - 100;
+
+            // Create temporary canvas to get text pixels
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = this.canvas.width;
+            tempCanvas.height = this.canvas.height;
+            
+            tempCtx.font = `bold ${fontSize}px 'Orbitron', sans-serif`;
+            tempCtx.fillStyle = 'white';
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(text, x, y);
+
+            // Get pixel data
+            const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+            const pixels = imageData.data;
+
+            // Sample pixels to create particles
+            const particleDensity = 3; // Lower = more particles
+            for (let y = 0; y < tempCanvas.height; y += particleDensity) {
+                for (let x = 0; x < tempCanvas.width; x += particleDensity) {
+                    const index = (y * tempCanvas.width + x) * 4;
+                    const alpha = pixels[index + 3];
+                    
+                    if (alpha > 128) { // If pixel is visible
+                        const particle = new Particle(this.canvas, true);
+                        particle.x = x;
+                        particle.y = y;
+                        particle.baseX = x;
+                        particle.baseY = y;
+                        particle.radius = 1.5;
+                        particle.opacity = 0.8;
+                        this.textParticles.push(particle);
+                    }
+                }
             }
         }
 
@@ -152,6 +202,13 @@
         animate() {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // Draw text particles first (background layer)
+            this.textParticles.forEach(particle => {
+                particle.update(this.mouse);
+                particle.draw(this.ctx);
+            });
+
+            // Draw regular particles and effects (foreground layer)
             this.particles.forEach(particle => {
                 particle.update(this.mouse);
                 particle.draw(this.ctx);
@@ -202,6 +259,7 @@
             window.addEventListener('resize', () => {
                 this.resizeCanvas();
                 this.createParticles();
+                this.createTextParticles();
             });
 
             // Mouse events
