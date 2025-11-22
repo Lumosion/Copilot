@@ -67,10 +67,18 @@
             }
         }
 
-        draw(ctx) {
+        draw(ctx, time, colors) {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            
+            // Add color variation for particles
+            const hue = this.isTextParticle 
+                ? colors.textParticleHue 
+                : (colors.particleBaseHue + Math.sin(time / colors.animationSpeed + this.x) * colors.particleHueVariation);
+            const saturation = this.isTextParticle ? 100 : 80;
+            const lightness = this.isTextParticle ? 70 : 60;
+            
+            ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${this.opacity})`;
             ctx.fill();
         }
     }
@@ -91,6 +99,21 @@
             this.maxDistance = 150;
             this.mouse = { x: null, y: null, radius: 150 };
             this.clickEffect = { active: false, x: 0, y: 0, radius: 0, maxRadius: 100, expanding: true };
+            this.currentTime = Date.now();
+            
+            // Color constants for particle effects
+            this.colors = {
+                textParticleHue: 190,
+                particleBaseHue: 180,
+                particleHueVariation: 30,
+                lineBaseHue: 190,
+                lineHueVariation: 30,
+                mouseConnectionBaseHue: 180,
+                mouseConnectionHueVariation: 60,
+                clickEffectPrimaryHue: 180,    // Cyan
+                clickEffectSecondaryHue: 270,  // Purple
+                animationSpeed: 1000
+            };
 
             this.init();
             this.animate();
@@ -168,8 +191,9 @@
 
                     if (distance < this.maxDistance) {
                         const opacity = (1 - distance / this.maxDistance) * 0.4;
+                        const hue = this.colors.lineBaseHue + (distance / this.maxDistance) * this.colors.lineHueVariation;
                         this.ctx.beginPath();
-                        this.ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                        this.ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${opacity})`;
                         this.ctx.lineWidth = 1;
                         this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
                         this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
@@ -189,9 +213,11 @@
 
                 if (distance < this.mouse.radius) {
                     const opacity = (1 - distance / this.mouse.radius) * 0.8;
+                    const hue = this.colors.mouseConnectionBaseHue + 
+                               (1 - distance / this.mouse.radius) * this.colors.mouseConnectionHueVariation;
                     this.ctx.beginPath();
-                    this.ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${opacity})`;
+                    this.ctx.lineWidth = 1.5;
                     this.ctx.moveTo(particle.x, particle.y);
                     this.ctx.lineTo(this.mouse.x, this.mouse.y);
                     this.ctx.stroke();
@@ -200,18 +226,19 @@
         }
 
         animate() {
+            this.currentTime = Date.now();
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             // Draw text particles first (background layer)
             this.textParticles.forEach(particle => {
                 particle.update(this.mouse);
-                particle.draw(this.ctx);
+                particle.draw(this.ctx, this.currentTime, this.colors);
             });
 
             // Draw regular particles and effects (foreground layer)
             this.particles.forEach(particle => {
                 particle.update(this.mouse);
-                particle.draw(this.ctx);
+                particle.draw(this.ctx, this.currentTime, this.colors);
             });
 
             this.drawLines();
@@ -237,19 +264,21 @@
                 }
             }
 
-            // Draw ripple effect
+            // Draw ripple effect with cyan/purple gradient
             const alpha = 1 - (this.clickEffect.radius / this.clickEffect.maxRadius);
+            
+            // Outer ripple (cyan)
             this.ctx.beginPath();
             this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius, 0, Math.PI * 2);
-            this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
+            this.ctx.strokeStyle = `hsla(${this.colors.clickEffectPrimaryHue}, 100%, 60%, ${alpha * 0.6})`;
             this.ctx.lineWidth = 2;
             this.ctx.stroke();
 
-            // Inner ripple
+            // Inner ripple (purple)
             if (this.clickEffect.radius > 20) {
                 this.ctx.beginPath();
                 this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius - 20, 0, Math.PI * 2);
-                this.ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
+                this.ctx.strokeStyle = `hsla(${this.colors.clickEffectSecondaryHue}, 100%, 60%, ${alpha * 0.4})`;
                 this.ctx.lineWidth = 1;
                 this.ctx.stroke();
             }
