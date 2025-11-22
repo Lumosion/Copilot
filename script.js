@@ -12,20 +12,37 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Add scroll effect to navigation
+// Consolidated scroll handler with throttling
 let lastScroll = 0;
+let ticking = false;
 const nav = document.querySelector('.main-nav');
 
-window.addEventListener('scroll', () => {
+const handleScroll = () => {
     const currentScroll = window.pageYOffset;
     
+    // Navigation shadow
     if (currentScroll <= 0) {
         nav.style.boxShadow = 'none';
     } else {
         nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
     }
     
+    // Parallax effect for hero section
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        heroContent.style.transform = `translateY(${currentScroll * 0.5}px)`;
+        heroContent.style.opacity = 1 - (currentScroll / 700);
+    }
+    
     lastScroll = currentScroll;
+    ticking = false;
+};
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(handleScroll);
+        ticking = true;
+    }
 });
 
 // Intersection Observer for fade-in animations
@@ -49,16 +66,6 @@ document.querySelectorAll('.operator-card, .news-card, .media-item, .feature-ite
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(el);
-});
-
-// Add parallax effect to hero section
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-        heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
-        heroContent.style.opacity = 1 - (scrolled / 700);
-    }
 });
 
 // Add hover effect for operator cards
@@ -106,36 +113,47 @@ const createParticles = () => {
     
     for (let i = 0; i < 50; i++) {
         const particle = document.createElement('div');
+        const size = Math.random() * 3;
+        const duration = Math.random() * 10 + 5;
+        const delay = Math.random() * 5;
+        const startX = Math.random() * 100;
+        const startY = Math.random() * 100;
+        const endX = startX + (Math.random() * 100 - 50);
+        const endY = startY + (Math.random() * 100 - 50);
+        
         particle.style.position = 'absolute';
-        particle.style.width = Math.random() * 3 + 'px';
-        particle.style.height = particle.style.width;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
         particle.style.background = 'rgba(0, 212, 255, 0.5)';
         particle.style.borderRadius = '50%';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animation = `float ${Math.random() * 10 + 5}s infinite`;
-        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.left = startX + '%';
+        particle.style.top = startY + '%';
+        particle.style.animation = `float-${i} ${duration}s infinite`;
+        particle.style.animationDelay = delay + 's';
+        
+        // Create unique keyframe for each particle
+        const keyframes = `
+            @keyframes float-${i} {
+                0%, 100% {
+                    transform: translate(0, 0);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(${endX - startX}px, ${endY - startY}px);
+                }
+            }
+        `;
+        
+        const style = document.createElement('style');
+        style.textContent = keyframes;
+        document.head.appendChild(style);
+        
         heroSection.appendChild(particle);
     }
 };
-
-// Add float animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes float {
-        0%, 100% {
-            transform: translate(0, 0);
-            opacity: 0;
-        }
-        50% {
-            opacity: 1;
-        }
-        100% {
-            transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
-        }
-    }
-`;
-document.head.appendChild(style);
 
 createParticles();
 
