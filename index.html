@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="明日方舟 Arknights - 策略塔防游戏">
-    <title>明日方舟 Arknights | 官方网站</title>
+    <meta name="description" content="明日方舟官方网站 - 鹰角网络开发的策略塔防手游">
+    <meta name="keywords" content="明日方舟,Arknights,塔防,手游,鹰角网络">
+    <title>明日方舟-鹰角网络</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,67 +13,130 @@
     <nav class="main-nav">
         <div class="nav-container">
             <div class="logo">
-                <h1>ARKNIGHTS</h1>
-                <span class="logo-subtitle">明日方舟</span>
+                <div class="logo-image">ARKNIGHTS</div>
             </div>
             <ul class="nav-menu">
                 <li><a href="#home">首页</a></li>
-                <li><a href="#game">游戏介绍</a></li>
+                <li><a href="#news">最新情报</a></li>
+                <li><a href="#world">世界观</a></li>
                 <li><a href="#operators">干员</a></li>
-                <li><a href="#news">新闻</a></li>
-                <li><a href="#media">媒体</a></li>
-                <li><a href="#download" class="download-link">下载游戏</a></li>
+                <li><a href="#game">游戏特色</a></li>
+                <li><a href="#media">资料</a></li>
+                <li><a href="#download" class="btn-download">下载游戏</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section id="home" class="hero-section">
-        <div class="hero-background">
+        <div class="hero-video-bg">
             <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
-            <div class="hero-logo">
+            <div class="hero-logo-container">
                 <h1 class="game-title">ARKNIGHTS</h1>
                 <p class="game-subtitle">明日方舟</p>
             </div>
-            <p class="hero-tagline">策略 · 塔防 · 角色养成</p>
-            <div class="hero-buttons">
+            <div class="hero-info">
+                <p class="hero-slogan">策略塔防·角色收集·养成战斗</p>
+                <p class="hero-desc">面对动荡的世界，你将带领罗德岛踏上前路未知的征途</p>
+            </div>
+            <div class="hero-actions">
                 <a href="#download" class="btn btn-primary">立即下载</a>
-                <a href="#game" class="btn btn-secondary">了解更多</a>
+                <a href="#game" class="btn btn-outline">了解详情</a>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <span>向下滚动</span>
+        <div class="scroll-hint">
+            <span class="scroll-text">下拉查看更多</span>
             <div class="scroll-arrow"></div>
         </div>
     </section>
 
-    <!-- Game Introduction -->
-    <section id="game" class="game-intro">
+    <!-- News Section -->
+    <section id="news" class="news-section">
         <div class="container">
-            <h2 class="section-title">游戏介绍</h2>
-            <div class="intro-content">
-                <div class="intro-text">
-                    <h3>欢迎来到泰拉世界</h3>
-                    <p>在这个被源石所改变的世界里，你将扮演罗德岛的领导者，带领干员们对抗感染者与非感染者之间的矛盾，探索这个充满未知的世界。</p>
-                    <p>《明日方舟》是一款策略塔防游戏，融合了角色养成、战略布局和即时策略等多种游戏元素。游戏拥有丰富的剧情、精美的立绘和独特的世界观设定。</p>
-                    <div class="features">
-                        <div class="feature-item">
-                            <span class="feature-icon">⚔️</span>
-                            <h4>策略塔防</h4>
-                            <p>部署干员，抵御敌人</p>
+            <h2 class="section-title">最新情报</h2>
+            <div class="news-tabs">
+                <button class="tab-btn active" data-tab="activity">活动</button>
+                <button class="tab-btn" data-tab="announcement">公告</button>
+                <button class="tab-btn" data-tab="news">新闻</button>
+            </div>
+            <div class="news-content">
+                <div class="news-list" id="activity">
+                    <div class="news-item featured">
+                        <div class="news-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400'%3E%3Crect fill='%23667eea' width='800' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3E主线剧情 第十二章%3C/text%3E%3C/svg%3E" alt="活动图片">
                         </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">👥</span>
-                            <h4>角色养成</h4>
-                            <p>收集培养数百位干员</p>
+                        <div class="news-info">
+                            <span class="news-tag">限时活动</span>
+                            <h3 class="news-title">主线12章「吾导先路」现已开启</h3>
+                            <p class="news-desc">罗德岛的博士们，主线剧情第十二章「吾导先路」现已正式开启。新的篇章，新的故事，等待各位博士前来探索。</p>
+                            <div class="news-meta">
+                                <span class="news-date">2024-01-20</span>
+                                <a href="#" class="news-link">查看详情 →</a>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📖</span>
-                            <h4>深度剧情</h4>
-                            <p>探索泰拉世界的秘密</p>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-img-small">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23f093fb' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='20' fill='white' text-anchor='middle' dy='.3em'%3E联动活动%3C/text%3E%3C/svg%3E" alt="活动图片">
                         </div>
+                        <div class="news-info">
+                            <span class="news-tag">联动</span>
+                            <h4 class="news-title-small">「愚人号」复刻活动即将开启</h4>
+                            <span class="news-date">2024-01-18</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-img-small">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%234facfe' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='20' fill='white' text-anchor='middle' dy='.3em'%3E限时寻访%3C/text%3E%3C/svg%3E" alt="活动图片">
+                        </div>
+                        <div class="news-info">
+                            <span class="news-tag">寻访</span>
+                            <h4 class="news-title-small">限定干员「特蕾西娅」寻访开启</h4>
+                            <span class="news-date">2024-01-15</span>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-img-small">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23fa709a' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='20' fill='white' text-anchor='middle' dy='.3em'%3E游戏更新%3C/text%3E%3C/svg%3E" alt="活动图片">
+                        </div>
+                        <div class="news-info">
+                            <span class="news-tag">更新</span>
+                            <h4 class="news-title-small">生息演算「沙洲遗闻」现已开启</h4>
+                            <span class="news-date">2024-01-12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- World View Section -->
+    <section id="world" class="world-section">
+        <div class="container">
+            <h2 class="section-title">世界观</h2>
+            <div class="world-content">
+                <div class="world-main">
+                    <h3>泰拉世界</h3>
+                    <p>在广袤的泰拉大陆上，源石技艺的蓬勃发展使得这片土地上的文明达到了空前的繁荣。然而，源石本身却也是矿石病的起源——一种席卷各国，致死率极高且目前尚无有效治疗手段的不治之症。</p>
+                    <p>感染者们流离失所，战争的阴云笼罩着大地。罗德岛是一支致力于救助感染者的医疗组织，在四处奔波中逐渐卷入各国间的纷争与黑幕。</p>
+                </div>
+                <div class="world-features">
+                    <div class="world-feature">
+                        <div class="feature-icon">🏛️</div>
+                        <h4>移动城邦</h4>
+                        <p>为了躲避天灾，各国建立了可以移动的巨型城市</p>
+                    </div>
+                    <div class="world-feature">
+                        <div class="feature-icon">💎</div>
+                        <h4>源石</h4>
+                        <p>蕴含巨大能量的矿物，同时也是矿石病的源头</p>
+                    </div>
+                    <div class="world-feature">
+                        <div class="feature-icon">⚔️</div>
+                        <h4>罗德岛</h4>
+                        <p>医疗组织，致力于为感染者提供救助</p>
                     </div>
                 </div>
             </div>
@@ -82,157 +146,168 @@
     <!-- Operators Showcase -->
     <section id="operators" class="operators-section">
         <div class="container">
-            <h2 class="section-title">精英干员</h2>
-            <p class="section-subtitle">认识罗德岛的精英成员</p>
-            <div class="operators-grid">
-                <div class="operator-card" data-rarity="6">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <span class="operator-icon">★★★★★★</span>
+            <h2 class="section-title">干员展示</h2>
+            <p class="section-desc">汇聚各地的精英干员，各具特色的能力与背景</p>
+            <div class="operators-showcase">
+                <div class="operator-featured">
+                    <div class="operator-large-card">
+                        <div class="operator-large-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g1)' width='600' height='800'/%3E%3Ctext x='50%25' y='45%25' font-size='48' fill='white' text-anchor='middle'%3E★★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='32' fill='white' text-anchor='middle'%3E陈%3C/text%3E%3C/svg%3E" alt="陈">
                         </div>
-                    </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">陈</h3>
-                        <p class="operator-class">近卫干员</p>
-                        <p class="operator-desc">龙门近卫局高级督察，擅长近战突击</p>
+                        <div class="operator-large-info">
+                            <div class="operator-rarity">★★★★★★</div>
+                            <h3 class="operator-name-large">陈</h3>
+                            <p class="operator-class-large">近卫干员</p>
+                            <p class="operator-desc-large">龙门近卫局特别督察组组长，拥有强大的源石技艺，擅长近战突击。在关键时刻能够发挥决定性作用。</p>
+                            <div class="operator-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">职业</span>
+                                    <span class="stat-value">近卫</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">定位</span>
+                                    <span class="stat-value">输出/爆发</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">获取方式</span>
+                                    <span class="stat-value">公开招募/寻访</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="operator-card" data-rarity="6">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <span class="operator-icon">★★★★★★</span>
+                <div class="operators-grid">
+                    <div class="operator-card" data-rarity="6">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f093fb'/%3E%3Cstop offset='100%25' style='stop-color:%23f5576c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g2)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E艾雅法拉%3C/text%3E%3C/svg%3E" alt="艾雅法拉">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★★</div>
+                            <h4 class="operator-name">艾雅法拉</h4>
+                            <p class="operator-class">术师</p>
                         </div>
                     </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">艾雅法拉</h3>
-                        <p class="operator-class">术师干员</p>
-                        <p class="operator-desc">强大的火山学家，精通源石技艺</p>
-                    </div>
-                </div>
-                <div class="operator-card" data-rarity="6">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <span class="operator-icon">★★★★★★</span>
+                    <div class="operator-card" data-rarity="6">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g3)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E银灰%3C/text%3E%3C/svg%3E" alt="银灰">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★★</div>
+                            <h4 class="operator-name">银灰</h4>
+                            <p class="operator-class">近卫</p>
                         </div>
                     </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">银灰</h3>
-                        <p class="operator-class">近卫干员</p>
-                        <p class="operator-desc">喀兰贸易的首领，剑术高超</p>
-                    </div>
-                </div>
-                <div class="operator-card" data-rarity="6">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                            <span class="operator-icon">★★★★★★</span>
+                    <div class="operator-card" data-rarity="6">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23fa709a'/%3E%3Cstop offset='100%25' style='stop-color:%23fee140'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g4)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E能天使%3C/text%3E%3C/svg%3E" alt="能天使">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★★</div>
+                            <h4 class="operator-name">能天使</h4>
+                            <p class="operator-class">狙击</p>
                         </div>
                     </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">能天使</h3>
-                        <p class="operator-class">狙击干员</p>
-                        <p class="operator-desc">企鹅物流的王牌，枪法精准</p>
-                    </div>
-                </div>
-                <div class="operator-card" data-rarity="5">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                            <span class="operator-icon">★★★★★</span>
+                    <div class="operator-card" data-rarity="6">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g5' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2343e97b'/%3E%3Cstop offset='100%25' style='stop-color:%2338f9d7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g5)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E闪灵%3C/text%3E%3C/svg%3E" alt="闪灵">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★★</div>
+                            <h4 class="operator-name">闪灵</h4>
+                            <p class="operator-class">医疗</p>
                         </div>
                     </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">德克萨斯</h3>
-                        <p class="operator-class">先锋干员</p>
-                        <p class="operator-desc">企鹅物流成员，擅长快速部署</p>
-                    </div>
-                </div>
-                <div class="operator-card" data-rarity="5">
-                    <div class="operator-image">
-                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
-                            <span class="operator-icon">★★★★★</span>
+                    <div class="operator-card" data-rarity="5">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g6' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23a8edea'/%3E%3Cstop offset='100%25' style='stop-color:%23fed6e3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g6)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E德克萨斯%3C/text%3E%3C/svg%3E" alt="德克萨斯">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★</div>
+                            <h4 class="operator-name">德克萨斯</h4>
+                            <p class="operator-class">先锋</p>
                         </div>
                     </div>
-                    <div class="operator-info">
-                        <h3 class="operator-name">白面鸮</h3>
-                        <p class="operator-class">医疗干员</p>
-                        <p class="operator-desc">罗德岛医疗干员，治疗专家</p>
+                    <div class="operator-card" data-rarity="5">
+                        <div class="operator-img">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g7' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23ffecd2'/%3E%3Cstop offset='100%25' style='stop-color:%23fcb69f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g7)' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' font-size='24' fill='white' text-anchor='middle'%3E★★★★★%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='20' fill='white' text-anchor='middle'%3E拉普兰德%3C/text%3E%3C/svg%3E" alt="拉普兰德">
+                        </div>
+                        <div class="operator-info">
+                            <div class="operator-rarity-small">★★★★★</div>
+                            <h4 class="operator-name">拉普兰德</h4>
+                            <p class="operator-class">近卫</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- News Section -->
-    <section id="news" class="news-section">
+    <!-- Game Features Section -->
+    <section id="game" class="game-features">
         <div class="container">
-            <h2 class="section-title">最新资讯</h2>
-            <div class="news-grid">
-                <div class="news-card featured">
-                    <div class="news-image">
-                        <div class="news-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <span class="news-badge">活动</span>
-                        </div>
+            <h2 class="section-title">游戏特色</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-img">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23667eea' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E⚔️%3C/text%3E%3C/svg%3E" alt="策略塔防">
                     </div>
-                    <div class="news-content">
-                        <span class="news-date">2024-01-15</span>
-                        <h3>新活动「源石尘行动」即将开启</h3>
-                        <p>全新活动即将上线，丰厚奖励等你来拿！探索全新的故事线，了解更多泰拉世界的秘密。</p>
-                        <a href="#" class="news-link">阅读更多 →</a>
+                    <div class="feature-content">
+                        <h3>策略塔防玩法</h3>
+                        <p>部署干员，抵御来犯之敌。充分利用干员特性，制定最优战术策略，在激烈的战斗中取得胜利。</p>
                     </div>
                 </div>
-                <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <span class="news-badge">更新</span>
-                        </div>
+                <div class="feature-card">
+                    <div class="feature-img">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f093fb' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E👥%3C/text%3E%3C/svg%3E" alt="干员收集">
                     </div>
-                    <div class="news-content">
-                        <span class="news-date">2024-01-10</span>
-                        <h3>新干员「煌」登场</h3>
-                        <p>强力六星近卫干员即将加入罗德岛，带来全新的战斗体验。</p>
-                        <a href="#" class="news-link">阅读更多 →</a>
+                    <div class="feature-content">
+                        <h3>丰富的干员收集</h3>
+                        <p>数百位性格迥异、能力各异的干员，每位都有独特的背景故事和技能特点，等待你的招募和培养。</p>
                     </div>
                 </div>
-                <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <span class="news-badge">公告</span>
-                        </div>
+                <div class="feature-card">
+                    <div class="feature-img">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%234facfe' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E📖%3C/text%3E%3C/svg%3E" alt="剧情">
                     </div>
-                    <div class="news-content">
-                        <span class="news-date">2024-01-05</span>
-                        <h3>版本更新维护公告</h3>
-                        <p>服务器将于1月20日进行例行维护，预计持续4小时。</p>
-                        <a href="#" class="news-link">阅读更多 →</a>
+                    <div class="feature-content">
+                        <h3>深度剧情体验</h3>
+                        <p>构建完整的世界观，主线与支线剧情交织，探索泰拉大陆的每一个角落，揭开隐藏的秘密。</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-img">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23fa709a' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E🎨%3C/text%3E%3C/svg%3E" alt="美术">
+                    </div>
+                    <div class="feature-content">
+                        <h3>精美的美术设计</h3>
+                        <p>精致的角色立绘，独特的美术风格，以及优秀的UI设计，为玩家带来极致的视觉享受。</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Media Gallery -->
+    <!-- Media Section -->
     <section id="media" class="media-section">
         <div class="container">
-            <h2 class="section-title">游戏画廊</h2>
-            <div class="media-grid">
-                <div class="media-item">
-                    <div class="media-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <span class="media-icon">🎮</span>
-                    </div>
+            <h2 class="section-title">游戏资料</h2>
+            <div class="media-tabs">
+                <button class="media-tab-btn active" data-tab="screenshots">游戏截图</button>
+                <button class="media-tab-btn" data-tab="videos">宣传视频</button>
+                <button class="media-tab-btn" data-tab="wallpapers">壁纸下载</button>
+            </div>
+            <div class="media-gallery">
+                <div class="gallery-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cdefs%3E%3ClinearGradient id='mg1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23mg1)' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3E游戏截图1%3C/text%3E%3C/svg%3E" alt="游戏截图">
                 </div>
-                <div class="media-item">
-                    <div class="media-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <span class="media-icon">🎨</span>
-                    </div>
+                <div class="gallery-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cdefs%3E%3ClinearGradient id='mg2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f093fb'/%3E%3Cstop offset='100%25' style='stop-color:%23f5576c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23mg2)' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3E游戏截图2%3C/text%3E%3C/svg%3E" alt="游戏截图">
                 </div>
-                <div class="media-item">
-                    <div class="media-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <span class="media-icon">⚔️</span>
-                    </div>
+                <div class="gallery-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cdefs%3E%3ClinearGradient id='mg3' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234facfe'/%3E%3Cstop offset='100%25' style='stop-color:%2300f2fe'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23mg3)' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3E游戏截图3%3C/text%3E%3C/svg%3E" alt="游戏截图">
                 </div>
-                <div class="media-item">
-                    <div class="media-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                        <span class="media-icon">🏰</span>
-                    </div>
+                <div class="gallery-item">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cdefs%3E%3ClinearGradient id='mg4' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23fa709a'/%3E%3Cstop offset='100%25' style='stop-color:%23fee140'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23mg4)' width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' text-anchor='middle' dy='.3em'%3E游戏截图4%3C/text%3E%3C/svg%3E" alt="游戏截图">
                 </div>
             </div>
         </div>
@@ -242,29 +317,70 @@
     <section id="download" class="download-section">
         <div class="container">
             <h2 class="section-title">立即下载</h2>
-            <p class="section-subtitle">加入数百万博士的队伍，开启你的罗德岛之旅</p>
-            <div class="download-options">
-                <a href="#" class="download-btn ios">
-                    <span class="download-icon">🍎</span>
-                    <div class="download-text">
-                        <span class="download-label">Download on the</span>
-                        <span class="download-store">App Store</span>
+            <p class="section-desc">加入数百万博士，开启你的罗德岛之旅</p>
+            <div class="download-platforms">
+                <a href="#" class="platform-btn ios">
+                    <div class="platform-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                        </svg>
+                    </div>
+                    <div class="platform-info">
+                        <span class="platform-label">Download on the</span>
+                        <span class="platform-name">App Store</span>
                     </div>
                 </a>
-                <a href="#" class="download-btn android">
-                    <span class="download-icon">🤖</span>
-                    <div class="download-text">
-                        <span class="download-label">GET IT ON</span>
-                        <span class="download-store">Google Play</span>
+                <a href="#" class="platform-btn android">
+                    <div class="platform-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.5 11.5 0 0 0-8.94 0L5.65 5.67c-.19-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85l1.84 3.18C2.92 11.03 1 14.22 1 17.8h22c0-3.58-1.92-6.77-5.4-8.32zM8.06 15.2c-.66 0-1.2-.54-1.2-1.2 0-.66.54-1.2 1.2-1.2.66 0 1.2.54 1.2 1.2 0 .66-.54 1.2-1.2 1.2zm7.88 0c-.66 0-1.2-.54-1.2-1.2 0-.66.54-1.2 1.2-1.2.66 0 1.2.54 1.2 1.2 0 .66-.54 1.2-1.2 1.2z"/>
+                        </svg>
+                    </div>
+                    <div class="platform-info">
+                        <span class="platform-label">GET IT ON</span>
+                        <span class="platform-name">Google Play</span>
                     </div>
                 </a>
-                <a href="#" class="download-btn bilibili">
-                    <span class="download-icon">📱</span>
-                    <div class="download-text">
-                        <span class="download-label">下载于</span>
-                        <span class="download-store">Bilibili 游戏</span>
+                <a href="#" class="platform-btn bilibili">
+                    <div class="platform-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773zM8 11.107c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373zm8 0c.373 0 .684.124.933.373.25.249.383.569.4.96v1.173c-.017.391-.15.711-.4.96-.249.25-.56.374-.933.374s-.684-.125-.933-.374c-.25-.249-.383-.569-.4-.96V12.44c.017-.391.15-.711.4-.96.249-.249.56-.373.933-.373z"/>
+                        </svg>
+                    </div>
+                    <div class="platform-info">
+                        <span class="platform-label">下载于</span>
+                        <span class="platform-name">哔哩哔哩</span>
                     </div>
                 </a>
+                <a href="#" class="platform-btn pc">
+                    <div class="platform-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/>
+                        </svg>
+                    </div>
+                    <div class="platform-info">
+                        <span class="platform-label">下载于</span>
+                        <span class="platform-name">PC模拟器</span>
+                    </div>
+                </a>
+            </div>
+            <div class="qr-code-section">
+                <div class="qr-code">
+                    <div class="qr-placeholder">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <rect fill="#000" width="150" height="150"/>
+                            <rect fill="#fff" x="10" y="10" width="30" height="30"/>
+                            <rect fill="#fff" x="110" y="10" width="30" height="30"/>
+                            <rect fill="#fff" x="10" y="110" width="30" height="30"/>
+                            <rect fill="#000" x="15" y="15" width="20" height="20"/>
+                            <rect fill="#000" x="115" y="15" width="20" height="20"/>
+                            <rect fill="#000" x="15" y="115" width="20" height="20"/>
+                            <rect fill="#fff" x="50" y="50" width="50" height="50"/>
+                            <text x="75" y="80" font-size="12" fill="#000" text-anchor="middle">QR</text>
+                        </svg>
+                    </div>
+                    <p class="qr-label">扫码下载</p>
+                </div>
             </div>
         </div>
     </section>
@@ -272,43 +388,66 @@
     <!-- Footer -->
     <footer class="main-footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>关于我们</h3>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <h3>ARKNIGHTS</h3>
+                        <p>明日方舟</p>
+                    </div>
+                    <p class="footer-desc">罗德岛，我们的征途永无止境</p>
+                </div>
+                <div class="footer-col">
+                    <h4>游戏</h4>
                     <ul>
-                        <li><a href="#">公司介绍</a></li>
-                        <li><a href="#">加入我们</a></li>
-                        <li><a href="#">联系方式</a></li>
+                        <li><a href="#">游戏介绍</a></li>
+                        <li><a href="#">世界观</a></li>
+                        <li><a href="#">干员图鉴</a></li>
+                        <li><a href="#">下载游戏</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h3>游戏支持</h3>
+                <div class="footer-col">
+                    <h4>支持</h4>
                     <ul>
-                        <li><a href="#">常见问题</a></li>
                         <li><a href="#">客服中心</a></li>
+                        <li><a href="#">常见问题</a></li>
                         <li><a href="#">用户协议</a></li>
+                        <li><a href="#">隐私政策</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h3>社交媒体</h3>
+                <div class="footer-col">
+                    <h4>社区</h4>
                     <ul>
                         <li><a href="#">官方微博</a></li>
                         <li><a href="#">官方微信</a></li>
-                        <li><a href="#">Bilibili</a></li>
+                        <li><a href="#">哔哩哔哩</a></li>
+                        <li><a href="#">官方论坛</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h3>相关链接</h3>
+                <div class="footer-col">
+                    <h4>关于</h4>
                     <ul>
-                        <li><a href="#">官方论坛</a></li>
-                        <li><a href="#">Wiki百科</a></li>
-                        <li><a href="#">周边商城</a></li>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">加入我们</a></li>
+                        <li><a href="#">联系方式</a></li>
+                        <li><a href="#">版权信息</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Hypergryph. All Rights Reserved.</p>
-                <p>本网站为演示页面 | 游戏内容版权归原公司所有</p>
+                <div class="footer-copyright">
+                    <p>© 2024 Hypergryph Co., Ltd. & Yostar Ltd. All Rights Reserved.</p>
+                    <p>上海鹰角网络科技有限公司 | 沪ICP备xxxxxxxx号-x | 文网游备字〔xxxx〕M-RPG xxxxx号</p>
+                    <p>本网站为演示页面，游戏内容版权归原公司所有</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#">用户协议</a>
+                    <span>|</span>
+                    <a href="#">隐私政策</a>
+                    <span>|</span>
+                    <a href="#">家长监护</a>
+                    <span>|</span>
+                    <a href="#">防沉迷</a>
+                </div>
             </div>
         </div>
     </footer>

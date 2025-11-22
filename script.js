@@ -12,43 +12,33 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Consolidated scroll handler with throttling
+// Navigation scroll effect
 let lastScroll = 0;
-let ticking = false;
 const nav = document.querySelector('.main-nav');
 
-const handleScroll = () => {
+window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
     
-    // Navigation shadow
     if (currentScroll <= 0) {
         nav.style.boxShadow = 'none';
     } else {
-        nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+        nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.8)';
     }
     
-    // Parallax effect for hero section
+    // Parallax effect for hero
     const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-        heroContent.style.transform = `translateY(${currentScroll * 0.5}px)`;
-        heroContent.style.opacity = 1 - (currentScroll / 700);
+    if (heroContent && currentScroll < window.innerHeight) {
+        heroContent.style.transform = `translateY(${currentScroll * 0.4}px)`;
+        heroContent.style.opacity = 1 - (currentScroll / 800);
     }
     
     lastScroll = currentScroll;
-    ticking = false;
-};
-
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        window.requestAnimationFrame(handleScroll);
-        ticking = true;
-    }
 });
 
 // Intersection Observer for fade-in animations
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px -100px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -60,20 +50,105 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe all cards and sections
-document.querySelectorAll('.operator-card, .news-card, .media-item, .feature-item').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-});
-
-// Add hover effect for operator cards
-document.querySelectorAll('.operator-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transition = 'all 0.3s ease';
+// Observe all animated elements
+document.addEventListener('DOMContentLoaded', () => {
+    const animatedElements = document.querySelectorAll(
+        '.operator-card, .news-item, .feature-card, .gallery-item, .world-feature'
+    );
+    
+    animatedElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
     });
 });
+
+// Tab functionality for news section
+const newsTabs = document.querySelectorAll('.tab-btn');
+newsTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        newsTabs.forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        tab.classList.add('active');
+    });
+});
+
+// Tab functionality for media section
+const mediaTabs = document.querySelectorAll('.media-tab-btn');
+mediaTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        mediaTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+    });
+});
+
+// Particle effect for hero background
+function createParticles() {
+    const heroSection = document.querySelector('.hero-video-bg');
+    if (!heroSection) return;
+    
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random() * 3 + 1;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        const startX = Math.random() * 100;
+        const startY = Math.random() * 100;
+        
+        particle.style.position = 'absolute';
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.background = 'rgba(0, 212, 255, 0.4)';
+        particle.style.borderRadius = '50%';
+        particle.style.left = startX + '%';
+        particle.style.top = startY + '%';
+        particle.style.animation = `float ${duration}s infinite`;
+        particle.style.animationDelay = delay + 's';
+        particle.style.pointerEvents = 'none';
+        
+        heroSection.appendChild(particle);
+    }
+    
+    // Add keyframes for floating animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0;
+            }
+            25% {
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                opacity: 1;
+            }
+            75% {
+                opacity: 0.8;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Initialize particles
+createParticles();
+
+// Update footer year
+const updateFooterYear = () => {
+    const yearElements = document.querySelectorAll('.footer-copyright p');
+    const currentYear = new Date().getFullYear();
+    yearElements.forEach(el => {
+        el.innerHTML = el.innerHTML.replace(/2024/g, currentYear);
+    });
+};
+
+updateFooterYear();
 
 // Loading animation
 window.addEventListener('load', () => {
@@ -81,84 +156,14 @@ window.addEventListener('load', () => {
     document.body.style.transition = 'opacity 0.5s ease';
 });
 
-// Mobile menu toggle (for future implementation)
-const createMobileMenu = () => {
-    const nav = document.querySelector('.nav-menu');
-    const navContainer = document.querySelector('.nav-container');
-    
+// Mobile menu (placeholder for future implementation)
+const handleResize = () => {
     if (window.innerWidth <= 768) {
-        // Mobile menu logic can be added here if needed
-        console.log('Mobile view detected');
+        console.log('Mobile view active');
     }
 };
 
-window.addEventListener('resize', createMobileMenu);
-createMobileMenu();
+window.addEventListener('resize', handleResize);
+handleResize();
 
-// Add dynamic year to footer
-const updateFooterYear = () => {
-    const yearElement = document.querySelector('.footer-bottom p');
-    if (yearElement) {
-        const currentYear = new Date().getFullYear();
-        yearElement.innerHTML = yearElement.innerHTML.replace('2024', currentYear);
-    }
-};
-
-updateFooterYear();
-
-// Particle effect for hero section (simple version)
-const createParticles = () => {
-    const heroSection = document.querySelector('.hero-background');
-    if (!heroSection) return;
-    
-    // Create a single style element for all particle animations
-    const styleSheet = document.createElement('style');
-    let keyframesCSS = '';
-    
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        const size = Math.random() * 3;
-        const duration = Math.random() * 10 + 5;
-        const delay = Math.random() * 5;
-        const startX = Math.random() * 100;
-        const startY = Math.random() * 100;
-        const endX = startX + (Math.random() * 100 - 50);
-        const endY = startY + (Math.random() * 100 - 50);
-        
-        particle.style.position = 'absolute';
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.background = 'rgba(0, 212, 255, 0.5)';
-        particle.style.borderRadius = '50%';
-        particle.style.left = startX + '%';
-        particle.style.top = startY + '%';
-        particle.style.animation = `float-${i} ${duration}s infinite`;
-        particle.style.animationDelay = delay + 's';
-        
-        // Add keyframe to the consolidated CSS
-        keyframesCSS += `
-            @keyframes float-${i} {
-                0%, 100% {
-                    transform: translate(0, 0);
-                    opacity: 0;
-                }
-                50% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translate(${endX - startX}px, ${endY - startY}px);
-                }
-            }
-        `;
-        
-        heroSection.appendChild(particle);
-    }
-    
-    // Add all keyframes at once
-    styleSheet.textContent = keyframesCSS;
-    document.head.appendChild(styleSheet);
-};
-
-createParticles();
-
-console.log('Arknights website loaded successfully!');
+console.log('Arknights official website loaded successfully!');
