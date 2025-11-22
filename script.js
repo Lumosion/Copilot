@@ -111,6 +111,10 @@ const createParticles = () => {
     const heroSection = document.querySelector('.hero-background');
     if (!heroSection) return;
     
+    // Create a single style element for all particle animations
+    const styleSheet = document.createElement('style');
+    let keyframesCSS = '';
+    
     for (let i = 0; i < 50; i++) {
         const particle = document.createElement('div');
         const size = Math.random() * 3;
@@ -131,8 +135,8 @@ const createParticles = () => {
         particle.style.animation = `float-${i} ${duration}s infinite`;
         particle.style.animationDelay = delay + 's';
         
-        // Create unique keyframe for each particle
-        const keyframes = `
+        // Add keyframe to the consolidated CSS
+        keyframesCSS += `
             @keyframes float-${i} {
                 0%, 100% {
                     transform: translate(0, 0);
@@ -147,12 +151,12 @@ const createParticles = () => {
             }
         `;
         
-        const style = document.createElement('style');
-        style.textContent = keyframes;
-        document.head.appendChild(style);
-        
         heroSection.appendChild(particle);
     }
+    
+    // Add all keyframes at once
+    styleSheet.textContent = keyframesCSS;
+    document.head.appendChild(styleSheet);
 };
 
 createParticles();
