@@ -1,126 +1,164 @@
-// Smooth scroll behavior for navigation links
-document.addEventListener('DOMContentLoaded', function() {
-    // Custom Cursor Control
-    const cursor = document.querySelector('.custom-cursor');
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
-
-    // Smooth cursor movement
-    function updateCursor() {
-        cursorX += (mouseX - cursorX) * 0.2;
-        cursorY += (mouseY - cursorY) * 0.2;
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
-        requestAnimationFrame(updateCursor);
-    }
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    updateCursor();
-
-    // Click effect
-    document.addEventListener('mousedown', () => {
-        cursor.classList.add('clicking');
-    });
-
-    document.addEventListener('mouseup', () => {
-        cursor.classList.remove('clicking');
-    });
-
-    // Hover effects on interactive elements
-    const interactiveElements = document.querySelectorAll('a, button, .btn, .skill-card, .project-card, .contact-item');
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            cursor.classList.add('hovering');
-        });
-        el.addEventListener('mouseleave', () => {
-            cursor.classList.remove('hovering');
-        });
-    });
-
-    // Add smooth scrolling for all anchor links
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Add scroll animation for sections
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in');
-            }
-        });
-    }, observerOptions);
-
-    // Observe all sections
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
-
-    // Highlight active navigation link on scroll
-    window.addEventListener('scroll', function() {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= sectionTop - 100) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
-            }
-        });
+// Smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     });
 });
 
-// Add fade-in animation styles dynamically
-const style = document.createElement('style');
-style.textContent = `
-    section {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.8s ease, transform 0.8s ease;
+// Consolidated scroll handler with throttling
+let lastScroll = 0;
+let ticking = false;
+const nav = document.querySelector('.main-nav');
+
+const handleScroll = () => {
+    const currentScroll = window.pageYOffset;
+    
+    // Navigation shadow
+    if (currentScroll <= 0) {
+        nav.style.boxShadow = 'none';
+    } else {
+        nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
     }
     
-    section.fade-in {
-        opacity: 1;
-        transform: translateY(0);
+    // Parallax effect for hero section
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        heroContent.style.transform = `translateY(${currentScroll * 0.5}px)`;
+        heroContent.style.opacity = 1 - (currentScroll / 700);
     }
     
-    .nav-links a.active {
-        color: var(--primary-color);
-        font-weight: 600;
+    lastScroll = currentScroll;
+    ticking = false;
+};
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(handleScroll);
+        ticking = true;
+    }
+});
+
+// Intersection Observer for fade-in animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Observe all cards and sections
+document.querySelectorAll('.operator-card, .news-card, .media-item, .feature-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+});
+
+// Add hover effect for operator cards
+document.querySelectorAll('.operator-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transition = 'all 0.3s ease';
+    });
+});
+
+// Loading animation
+window.addEventListener('load', () => {
+    document.body.style.opacity = '1';
+    document.body.style.transition = 'opacity 0.5s ease';
+});
+
+// Mobile menu toggle (for future implementation)
+const createMobileMenu = () => {
+    const nav = document.querySelector('.nav-menu');
+    const navContainer = document.querySelector('.nav-container');
+    
+    if (window.innerWidth <= 768) {
+        // Mobile menu logic can be added here if needed
+        console.log('Mobile view detected');
+    }
+};
+
+window.addEventListener('resize', createMobileMenu);
+createMobileMenu();
+
+// Add dynamic year to footer
+const updateFooterYear = () => {
+    const yearElement = document.querySelector('.footer-bottom p');
+    if (yearElement) {
+        const currentYear = new Date().getFullYear();
+        yearElement.innerHTML = yearElement.innerHTML.replace('2024', currentYear);
+    }
+};
+
+updateFooterYear();
+
+// Particle effect for hero section (simple version)
+const createParticles = () => {
+    const heroSection = document.querySelector('.hero-background');
+    if (!heroSection) return;
+    
+    // Create a single style element for all particle animations
+    const styleSheet = document.createElement('style');
+    let keyframesCSS = '';
+    
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random() * 3;
+        const duration = Math.random() * 10 + 5;
+        const delay = Math.random() * 5;
+        const startX = Math.random() * 100;
+        const startY = Math.random() * 100;
+        const endX = startX + (Math.random() * 100 - 50);
+        const endY = startY + (Math.random() * 100 - 50);
+        
+        particle.style.position = 'absolute';
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.background = 'rgba(0, 212, 255, 0.5)';
+        particle.style.borderRadius = '50%';
+        particle.style.left = startX + '%';
+        particle.style.top = startY + '%';
+        particle.style.animation = `float-${i} ${duration}s infinite`;
+        particle.style.animationDelay = delay + 's';
+        
+        // Add keyframe to the consolidated CSS
+        keyframesCSS += `
+            @keyframes float-${i} {
+                0%, 100% {
+                    transform: translate(0, 0);
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(${endX - startX}px, ${endY - startY}px);
+                }
+            }
+        `;
+        
+        heroSection.appendChild(particle);
     }
     
-    .nav-links a.active::after {
-        width: 100%;
-    }
-`;
-document.head.appendChild(style);
+    // Add all keyframes at once
+    styleSheet.textContent = keyframesCSS;
+    document.head.appendChild(styleSheet);
+};
+
+createParticles();
+
+console.log('Arknights website loaded successfully!');

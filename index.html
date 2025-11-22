@@ -3,202 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="个人主页 - Personal Homepage">
-    <title>个人主页 | Personal Homepage</title>
+    <meta name="description" content="明日方舟 Arknights - 策略塔防游戏">
+    <title>明日方舟 Arknights | 官方网站</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Custom Diamond Cursor -->
-    <div class="custom-cursor">
-        <div class="cursor-diamond"></div>
-        <div class="cursor-ring"></div>
-    </div>
-    
-    <!-- Particle Background Canvas -->
-    <canvas id="particles-js"></canvas>
-    <header>
-        <nav>
-            <div class="container">
-                <h1 class="logo">我的主页</h1>
-                <ul class="nav-links">
-                    <li><a href="#about">关于我</a></li>
-                    <li><a href="#skills">技能</a></li>
-                    <li><a href="#projects">项目</a></li>
-                    <li><a href="#contact">联系方式</a></li>
-                </ul>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>ARKNIGHTS</h1>
+                <span class="logo-subtitle">明日方舟</span>
             </div>
-        </nav>
-    </header>
+            <ul class="nav-menu">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#game">游戏介绍</a></li>
+                <li><a href="#operators">干员</a></li>
+                <li><a href="#news">新闻</a></li>
+                <li><a href="#media">媒体</a></li>
+                <li><a href="#download" class="download-link">下载游戏</a></li>
+            </ul>
+        </div>
+    </nav>
 
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">你好，我是 <span class="highlight">开发者</span></h1>
-                    <p class="hero-subtitle">全栈开发工程师 | 技术爱好者 | 终身学习者</p>
-                    <div class="hero-buttons">
-                        <a href="#contact" class="btn btn-primary">联系我</a>
-                        <a href="#projects" class="btn btn-secondary">查看项目</a>
-                    </div>
-                </div>
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-logo">
+                <h1 class="game-title">ARKNIGHTS</h1>
+                <p class="game-subtitle">明日方舟</p>
             </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="about">
-            <div class="container">
-                <h2 class="section-title">关于我</h2>
-                <div class="about-content">
-                    <div class="about-text">
-                        <p>大家好！我是一名热爱编程的开发者，专注于创建高质量的应用程序和解决复杂的技术问题。</p>
-                        <p>我对新技术充满热情，始终保持学习的态度，不断提升自己的技能。在工作中，我注重代码质量、用户体验和团队协作。</p>
-                        <p>除了编程，我也喜欢分享知识、参与开源项目，并与技术社区保持活跃的互动。</p>
-                    </div>
-                    <div class="about-info">
-                        <div class="info-item">
-                            <h3>教育背景</h3>
-                            <p>计算机科学与技术专业</p>
-                        </div>
-                        <div class="info-item">
-                            <h3>工作经验</h3>
-                            <p>软件开发工程师</p>
-                        </div>
-                        <div class="info-item">
-                            <h3>兴趣爱好</h3>
-                            <p>编程、阅读、开源贡献</p>
-                        </div>
-                    </div>
-                </div>
+            <p class="hero-tagline">策略 · 塔防 · 角色养成</p>
+            <div class="hero-buttons">
+                <a href="#download" class="btn btn-primary">立即下载</a>
+                <a href="#game" class="btn btn-secondary">了解更多</a>
             </div>
-        </section>
+        </div>
+        <div class="scroll-indicator">
+            <span>向下滚动</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
 
-        <!-- Skills Section -->
-        <section id="skills" class="skills">
-            <div class="container">
-                <h2 class="section-title">技能专长</h2>
-                <div class="skills-grid">
-                    <div class="skill-card">
-                        <div class="skill-icon">💻</div>
-                        <h3>前端开发</h3>
-                        <p>HTML, CSS, JavaScript, React, Vue.js</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">⚙️</div>
-                        <h3>后端开发</h3>
-                        <p>Node.js, Python, Java, Spring Boot</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">🗄️</div>
-                        <h3>数据库</h3>
-                        <p>MySQL, MongoDB, Redis, PostgreSQL</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">🔧</div>
-                        <h3>开发工具</h3>
-                        <p>Git, Docker, Linux, VS Code</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">☁️</div>
-                        <h3>云服务</h3>
-                        <p>AWS, Azure, 阿里云</p>
-                    </div>
-                    <div class="skill-card">
-                        <div class="skill-icon">📱</div>
-                        <h3>移动开发</h3>
-                        <p>React Native, Flutter</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects Section -->
-        <section id="projects" class="projects">
-            <div class="container">
-                <h2 class="section-title">项目展示</h2>
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <h3>项目一</h3>
-                        <p class="project-description">
-                            一个创新的Web应用程序，提供用户友好的界面和强大的功能。
-                        </p>
-                        <div class="project-tags">
-                            <span class="tag">React</span>
-                            <span class="tag">Node.js</span>
-                            <span class="tag">MongoDB</span>
-                        </div>
-                        <a href="#" class="project-link">查看详情 →</a>
-                    </div>
-                    <div class="project-card">
-                        <h3>项目二</h3>
-                        <p class="project-description">
-                            高性能的后端服务系统，支持大规模并发访问和数据处理。
-                        </p>
-                        <div class="project-tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">Django</span>
-                            <span class="tag">Redis</span>
-                        </div>
-                        <a href="#" class="project-link">查看详情 →</a>
-                    </div>
-                    <div class="project-card">
-                        <h3>项目三</h3>
-                        <p class="project-description">
-                            移动端应用开发，提供流畅的用户体验和离线功能支持。
-                        </p>
-                        <div class="project-tags">
-                            <span class="tag">React Native</span>
-                            <span class="tag">TypeScript</span>
-                            <span class="tag">Firebase</span>
-                        </div>
-                        <a href="#" class="project-link">查看详情 →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="contact">
-            <div class="container">
-                <h2 class="section-title">联系方式</h2>
-                <div class="contact-content">
-                    <p class="contact-intro">欢迎与我联系，探讨技术话题或合作机会！</p>
-                    <div class="contact-methods">
-                        <div class="contact-item">
-                            <div class="contact-icon">📧</div>
-                            <h3>邮箱</h3>
-                            <p>your.email@example.com</p>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">🔗</div>
-                            <h3>GitHub</h3>
-                            <p><a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></p>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">💼</div>
-                            <h3>LinkedIn</h3>
-                            <p><a href="#" target="_blank">linkedin.com/in/yourprofile</a></p>
-                        </div>
-                        <div class="contact-item">
-                            <div class="contact-icon">🌐</div>
-                            <h3>博客</h3>
-                            <p><a href="#" target="_blank">yourblog.com</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
+    <!-- Game Introduction -->
+    <section id="game" class="game-intro">
         <div class="container">
-            <p>&copy; 2024 个人主页. All rights reserved.</p>
-            <p>Made with ❤️ by GitHub Pages</p>
+            <h2 class="section-title">游戏介绍</h2>
+            <div class="intro-content">
+                <div class="intro-text">
+                    <h3>欢迎来到泰拉世界</h3>
+                    <p>在这个被源石所改变的世界里，你将扮演罗德岛的领导者，带领干员们对抗感染者与非感染者之间的矛盾，探索这个充满未知的世界。</p>
+                    <p>《明日方舟》是一款策略塔防游戏，融合了角色养成、战略布局和即时策略等多种游戏元素。游戏拥有丰富的剧情、精美的立绘和独特的世界观设定。</p>
+                    <div class="features">
+                        <div class="feature-item">
+                            <span class="feature-icon">⚔️</span>
+                            <h4>策略塔防</h4>
+                            <p>部署干员，抵御敌人</p>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">👥</span>
+                            <h4>角色养成</h4>
+                            <p>收集培养数百位干员</p>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📖</span>
+                            <h4>深度剧情</h4>
+                            <p>探索泰拉世界的秘密</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Operators Showcase -->
+    <section id="operators" class="operators-section">
+        <div class="container">
+            <h2 class="section-title">精英干员</h2>
+            <p class="section-subtitle">认识罗德岛的精英成员</p>
+            <div class="operators-grid">
+                <div class="operator-card" data-rarity="6">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span class="operator-icon">★★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">陈</h3>
+                        <p class="operator-class">近卫干员</p>
+                        <p class="operator-desc">龙门近卫局高级督察，擅长近战突击</p>
+                    </div>
+                </div>
+                <div class="operator-card" data-rarity="6">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <span class="operator-icon">★★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">艾雅法拉</h3>
+                        <p class="operator-class">术师干员</p>
+                        <p class="operator-desc">强大的火山学家，精通源石技艺</p>
+                    </div>
+                </div>
+                <div class="operator-card" data-rarity="6">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <span class="operator-icon">★★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">银灰</h3>
+                        <p class="operator-class">近卫干员</p>
+                        <p class="operator-desc">喀兰贸易的首领，剑术高超</p>
+                    </div>
+                </div>
+                <div class="operator-card" data-rarity="6">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <span class="operator-icon">★★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">能天使</h3>
+                        <p class="operator-class">狙击干员</p>
+                        <p class="operator-desc">企鹅物流的王牌，枪法精准</p>
+                    </div>
+                </div>
+                <div class="operator-card" data-rarity="5">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <span class="operator-icon">★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">德克萨斯</h3>
+                        <p class="operator-class">先锋干员</p>
+                        <p class="operator-desc">企鹅物流成员，擅长快速部署</p>
+                    </div>
+                </div>
+                <div class="operator-card" data-rarity="5">
+                    <div class="operator-image">
+                        <div class="operator-placeholder" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                            <span class="operator-icon">★★★★★</span>
+                        </div>
+                    </div>
+                    <div class="operator-info">
+                        <h3 class="operator-name">白面鸮</h3>
+                        <p class="operator-class">医疗干员</p>
+                        <p class="operator-desc">罗德岛医疗干员，治疗专家</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="news" class="news-section">
+        <div class="container">
+            <h2 class="section-title">最新资讯</h2>
+            <div class="news-grid">
+                <div class="news-card featured">
+                    <div class="news-image">
+                        <div class="news-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span class="news-badge">活动</span>
+                        </div>
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2024-01-15</span>
+                        <h3>新活动「源石尘行动」即将开启</h3>
+                        <p>全新活动即将上线，丰厚奖励等你来拿！探索全新的故事线，了解更多泰拉世界的秘密。</p>
+                        <a href="#" class="news-link">阅读更多 →</a>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-image">
+                        <div class="news-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <span class="news-badge">更新</span>
+                        </div>
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2024-01-10</span>
+                        <h3>新干员「煌」登场</h3>
+                        <p>强力六星近卫干员即将加入罗德岛，带来全新的战斗体验。</p>
+                        <a href="#" class="news-link">阅读更多 →</a>
+                    </div>
+                </div>
+                <div class="news-card">
+                    <div class="news-image">
+                        <div class="news-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <span class="news-badge">公告</span>
+                        </div>
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2024-01-05</span>
+                        <h3>版本更新维护公告</h3>
+                        <p>服务器将于1月20日进行例行维护，预计持续4小时。</p>
+                        <a href="#" class="news-link">阅读更多 →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Media Gallery -->
+    <section id="media" class="media-section">
+        <div class="container">
+            <h2 class="section-title">游戏画廊</h2>
+            <div class="media-grid">
+                <div class="media-item">
+                    <div class="media-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="media-icon">🎮</span>
+                    </div>
+                </div>
+                <div class="media-item">
+                    <div class="media-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <span class="media-icon">🎨</span>
+                    </div>
+                </div>
+                <div class="media-item">
+                    <div class="media-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <span class="media-icon">⚔️</span>
+                    </div>
+                </div>
+                <div class="media-item">
+                    <div class="media-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <span class="media-icon">🏰</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download-section">
+        <div class="container">
+            <h2 class="section-title">立即下载</h2>
+            <p class="section-subtitle">加入数百万博士的队伍，开启你的罗德岛之旅</p>
+            <div class="download-options">
+                <a href="#" class="download-btn ios">
+                    <span class="download-icon">🍎</span>
+                    <div class="download-text">
+                        <span class="download-label">Download on the</span>
+                        <span class="download-store">App Store</span>
+                    </div>
+                </a>
+                <a href="#" class="download-btn android">
+                    <span class="download-icon">🤖</span>
+                    <div class="download-text">
+                        <span class="download-label">GET IT ON</span>
+                        <span class="download-store">Google Play</span>
+                    </div>
+                </a>
+                <a href="#" class="download-btn bilibili">
+                    <span class="download-icon">📱</span>
+                    <div class="download-text">
+                        <span class="download-label">下载于</span>
+                        <span class="download-store">Bilibili 游戏</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <ul>
+                        <li><a href="#">公司介绍</a></li>
+                        <li><a href="#">加入我们</a></li>
+                        <li><a href="#">联系方式</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>游戏支持</h3>
+                    <ul>
+                        <li><a href="#">常见问题</a></li>
+                        <li><a href="#">客服中心</a></li>
+                        <li><a href="#">用户协议</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>社交媒体</h3>
+                    <ul>
+                        <li><a href="#">官方微博</a></li>
+                        <li><a href="#">官方微信</a></li>
+                        <li><a href="#">Bilibili</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>相关链接</h3>
+                    <ul>
+                        <li><a href="#">官方论坛</a></li>
+                        <li><a href="#">Wiki百科</a></li>
+                        <li><a href="#">周边商城</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Hypergryph. All Rights Reserved.</p>
+                <p>本网站为演示页面 | 游戏内容版权归原公司所有</p>
+            </div>
         </div>
     </footer>
 
-    <!-- Custom Particle Script -->
-    <script src="particles.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

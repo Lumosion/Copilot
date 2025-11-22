@@ -1,18 +1,27 @@
-# Copilot - Personal Homepage
+# 明日方舟 Arknights - 官方网站演示
 
-这是一个使用 GitHub Pages 部署的个人主页项目。
+这是一个仿照明日方舟（Arknights）官方网站风格制作的演示页面。
 
 ## 功能特点
 
-- 🎨 现代化的设计风格
-- 📱 响应式布局，支持移动端
-- ✨ 流畅的滚动动画效果
-- 🎯 清晰的导航系统
-- 💼 展示个人信息、技能、项目和联系方式
+- 🎮 **游戏主题设计** - 深色科技感的游戏网站风格
+- 🌟 **精美动画** - 流畅的滚动动画和交互效果
+- 📱 **响应式布局** - 完美支持移动端和桌面端
+- 🎯 **完整功能** - 包含游戏介绍、干员展示、新闻资讯等完整板块
+- 💫 **动态效果** - 粒子背景、悬停动画等视觉效果
+
+## 页面内容
+
+- **首页** - 大气的英雄区域展示
+- **游戏介绍** - 游戏世界观和特色功能介绍
+- **精英干员** - 展示游戏中的精英干员角色
+- **最新资讯** - 游戏活动、更新和公告
+- **游戏画廊** - 游戏截图和媒体展示
+- **下载专区** - 多平台下载链接
 
 ## 在线访问
 
-访问 GitHub Pages 查看效果：`https://yourusername.github.io/Copilot/`
+访问 GitHub Pages 查看效果：`https://lumosion.github.io/Copilot/`
 
 ## 本地预览
 
@@ -22,7 +31,7 @@ git clone https://github.com/Lumosion/Copilot.git
 cd Copilot
 ```
 
-2. 使用任意 HTTP 服务器预览，例如：
+2. 使用任意 HTTP 服务器预览：
 ```bash
 # 使用 Python
 python3 -m http.server 8080
@@ -35,26 +44,32 @@ npx http-server
 
 ## 自定义内容
 
-您可以编辑以下文件来自定义您的个人主页：
+您可以编辑以下文件来自定义网站内容：
 
-- **index.html** - 修改个人信息、技能、项目等内容
-- **styles.css** - 调整颜色、字体、布局等样式
-- **script.js** - 修改交互效果和动画
-
-## 部署到 GitHub Pages
-
-1. 前往仓库的 Settings > Pages
-2. 在 "Source" 下选择主分支（main 或 master）
-3. 点击 "Save"
-4. 几分钟后，您的网站将发布到 `https://yourusername.github.io/Copilot/`
+- **index.html** - 修改页面内容、干员信息、新闻等
+- **styles.css** - 调整颜色方案、布局、动画效果
+- **script.js** - 修改交互逻辑和动态效果
 
 ## 技术栈
 
 - HTML5
-- CSS3
+- CSS3 (Flexbox, Grid, Animations)
 - Vanilla JavaScript
 - GitHub Pages
 
+## 特色功能
+
+- 🎨 渐变色卡片设计
+- ✨ 平滑滚动导航
+- 🔮 视觉差滚动效果
+- 💫 交互式动画
+- 📊 响应式网格布局
+- 🌈 现代化配色方案
+
+## 声明
+
+本网站为演示页面，所有游戏内容版权归 Hypergryph 及其关联公司所有。此项目仅用于学习和展示目的。
+
 ## 许可证
 
-© 2024 个人主页. All rights reserved.
+© 2024 演示项目. 游戏内容版权归原公司所有.
