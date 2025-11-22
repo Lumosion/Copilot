@@ -67,20 +67,17 @@
             }
         }
 
-        draw(ctx) {
+        draw(ctx, time) {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             
             // Add color variation for particles
-            const hue = this.isTextParticle ? 190 : (180 + Math.sin(Date.now() / 1000 + this.x) * 30);
+            const hue = this.isTextParticle ? 190 : (180 + Math.sin(time / 1000 + this.x) * 30);
             const saturation = this.isTextParticle ? 100 : 80;
             const lightness = this.isTextParticle ? 70 : 60;
             
             ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${this.opacity})`;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = `hsla(${hue}, ${saturation}%, ${lightness}%, ${this.opacity * 0.8})`;
             ctx.fill();
-            ctx.shadowBlur = 0;
         }
     }
 
@@ -100,6 +97,7 @@
             this.maxDistance = 150;
             this.mouse = { x: null, y: null, radius: 150 };
             this.clickEffect = { active: false, x: 0, y: 0, radius: 0, maxRadius: 100, expanding: true };
+            this.currentTime = Date.now();
 
             this.init();
             this.animate();
@@ -211,18 +209,19 @@
         }
 
         animate() {
+            this.currentTime = Date.now();
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             // Draw text particles first (background layer)
             this.textParticles.forEach(particle => {
                 particle.update(this.mouse);
-                particle.draw(this.ctx);
+                particle.draw(this.ctx, this.currentTime);
             });
 
             // Draw regular particles and effects (foreground layer)
             this.particles.forEach(particle => {
                 particle.update(this.mouse);
-                particle.draw(this.ctx);
+                particle.draw(this.ctx, this.currentTime);
             });
 
             this.drawLines();
@@ -258,10 +257,7 @@
             this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius, 0, Math.PI * 2);
             this.ctx.strokeStyle = `hsla(${hue1}, 100%, 60%, ${alpha * 0.6})`;
             this.ctx.lineWidth = 2;
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = `hsla(${hue1}, 100%, 60%, ${alpha * 0.5})`;
             this.ctx.stroke();
-            this.ctx.shadowBlur = 0;
 
             // Inner ripple with different color
             if (this.clickEffect.radius > 20) {
@@ -269,10 +265,7 @@
                 this.ctx.arc(this.clickEffect.x, this.clickEffect.y, this.clickEffect.radius - 20, 0, Math.PI * 2);
                 this.ctx.strokeStyle = `hsla(${hue2}, 100%, 60%, ${alpha * 0.4})`;
                 this.ctx.lineWidth = 1;
-                this.ctx.shadowBlur = 10;
-                this.ctx.shadowColor = `hsla(${hue2}, 100%, 60%, ${alpha * 0.3})`;
                 this.ctx.stroke();
-                this.ctx.shadowBlur = 0;
             }
         }
 
