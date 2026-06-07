@@ -1,23 +1,26 @@
-# 多内容记录站（前端 MVP）
+# 多内容追踪站（前端 MVP）
 
-一个可记录多种内容的轻量网站，支持记录：
-- 💻 电脑
-- 📺 电视剧
-- 🌸 番剧
-- 🎵 音乐
-- 🎮 游戏
-
-当前版本优先实现前端，数据使用本地示例 + localStorage 持久化，并提供影视内容的 TMDB / IMDb 自动匹配回填能力。
+一个可追踪多类型内容的轻量网站，当前支持：
+- 🎬 电影（TMDB）
+- 📺 剧集（TMDB，支持剧/季/集页面）
+- 🌸 番剧（TMDB + RSS 追番）
+- 🎮 游戏（Steam AppID 抓取）
+- 🎵 音乐（网易云批量导入）
 
 ## 功能概览
 
-- 统一信息结构：列表页 / 详情页 / 新增编辑页 / 搜索筛选
-- 多分类内容记录与本地 CRUD
-- 关键词搜索、分类 Tab 筛选、排序
-- TMDB / IMDb 自动匹配（电视剧/番剧）并回填标题、年份、评分、简介、标签、封面
-- 前端数据工具：导入 JSON、导出 JSON、删除全部记录
-- 状态覆盖：加载中、空结果、多结果、网络失败、限流提示
-- 响应式布局与基础可访问性（表单标签、状态播报）
+- 顶层 TAB 分类：电影 / 剧集 / 番剧 / 游戏 / 音乐
+- 全局搜索（标题、标签、平台、演员、剧情）
+- 列表页 / 详情页 / 编辑页 / 订阅中心 / 剧集页
+- 影视匹配与详情回填：
+  - 电影与剧集分开搜索（TMDB movie/tv）
+  - 中文优先 + 英文兜底
+  - 影视记录 ID 统一以 TMDB 为准（`tmdb:movie:{id}` / `tmdb:tv:{id}`）
+- 关系页能力（详情页内）：同系列 / 同演员 / 同标签 / 同平台
+- 番剧 RSS 订阅：添加、刷新、查看更新条目
+- 音乐网易云批量导入：按行 `歌名 - 歌手`
+- 游戏 Steam 抓取：通过 AppID 自动回填
+- 本地数据管理：导入 JSON、导出 JSON、删除全部
 
 ## 技术栈
 
@@ -25,8 +28,9 @@
 - CSS3
 - Vanilla JavaScript
 - LocalStorage
-- OMDb API（IMDb 数据来源）
-- TMDB API（可选，用于额外自动匹配）
+- TMDB API
+- Steam Store API
+- RSS (XML) 解析
 
 ## 本地运行
 
@@ -37,27 +41,21 @@ python3 -m http.server 8080
 
 浏览器访问：`http://localhost:8080`
 
-## TMDB / IMDb 查询说明
+## API 配置
 
-项目默认使用示例 API Key：`thewdb`（来自 OMDb 公共示例）。
+请在 `/tmp/workspace/Lumosion/Copilot/script.js` 中配置：
 
-如需长期稳定使用，请在 `/tmp/workspace/Lumosion/Copilot/script.js` 中替换：
+- `TMDB_API_KEY`（必填）
 
-- `OMDB_API_KEY`
-- `OMDB_ENDPOINT`（如有私有代理）
-- `TMDB_API_KEY`（可选，不配置时会自动仅使用 IMDb）
+说明：
+- 未配置 TMDB Key 时，影视自动匹配与季集详情不可用。
+- RSS 与 Steam 抓取可能受浏览器跨域策略影响。
 
-## 数据层设计
+## 数据结构说明
 
-`ContentService` 统一封装：
-- `list` / `getById` / `save` / `remove`
-- `searchMediaMatch` / `getMediaDetail`
+核心记录字段：
+- `id`：影视为 TMDB 规范 ID，其它类型为 UUID
+- `category`：movie / series / anime / game / music
+- `media`：来源相关结构（tmdb/steam/netease）
 
-前端 UI 仅调用 service，不直接依赖存储细节，后续可平滑替换为后端 API。
-
-## 后续阶段（建议）
-
-- 接入后端持久化与用户体系
-- 分类字段按业务进一步细分
-- TMDB / IMDb 导入结果缓存
-- 增加自动化测试与 CI
+当前为前端本地存储实现，后续可平滑替换为后端 API。

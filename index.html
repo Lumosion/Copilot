@@ -3,155 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="多内容记录站 - 记录电脑、电视剧、番剧、音乐和游戏">
-    <meta name="keywords" content="内容记录,电脑,电视剧,番剧,音乐,游戏,IMDb">
-    <title>多内容记录站</title>
+    <meta name="description" content="多内容追踪站 - 电影、剧集、番剧、游戏、音乐统一管理">
+    <meta name="keywords" content="TMDB,Steam,RSS,网易云,电影,剧集,番剧,游戏,音乐">
+    <title>多内容追踪站</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container header-inner">
-            <div>
-                <h1 class="site-title">📚 多内容记录站</h1>
-                <p class="site-subtitle">记录你的电脑、电视剧、番剧、音乐、游戏</p>
-            </div>
-            <nav aria-label="主导航">
-                <ul class="nav-list">
-                    <li><button class="nav-btn active" data-view="listView">列表</button></li>
-                    <li><button class="nav-btn" data-view="editorView">新增</button></li>
-                </ul>
-            </nav>
+<header class="site-header">
+    <div class="container header-inner">
+        <div>
+            <h1 class="site-title">📚 多内容追踪站</h1>
+            <p class="site-subtitle">电影 / 剧集 / 番剧 / 游戏 / 音乐</p>
         </div>
-    </header>
+        <nav aria-label="主导航">
+            <ul class="nav-list">
+                <li><button class="nav-btn active" data-view="listView">列表</button></li>
+                <li><button class="nav-btn" data-view="editorView">新增</button></li>
+                <li><button class="nav-btn" data-view="subscriptionView">订阅中心</button></li>
+            </ul>
+        </nav>
+    </div>
+</header>
 
-    <main class="container app-main" id="appMain">
-        <section class="panel controls-panel" aria-label="搜索筛选">
-            <div class="controls-grid">
-                <div class="control-item category-control">
-                    <span>分类</span>
-                    <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="分类标签">
-                        <button class="category-tab active" type="button" role="tab" aria-selected="true" data-category="all">全部</button>
-                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="computer">电脑</button>
-                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="tv">电视剧</button>
-                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="anime">番剧</button>
-                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="music">音乐</button>
-                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="game">游戏</button>
-                    </div>
-                </div>
-                <label class="control-item">
-                    <span>关键词</span>
-                    <input id="searchInput" type="search" placeholder="按标题、标签、备注搜索">
-                </label>
-                <label class="control-item">
-                    <span>排序</span>
-                    <select id="sortBy">
-                        <option value="updatedAt">最近更新</option>
-                        <option value="title">标题 A-Z</option>
-                        <option value="rating">评分高到低</option>
-                    </select>
-                </label>
-            </div>
-        </section>
-
-        <section id="listView" class="view panel" aria-labelledby="listHeading">
-            <div class="view-head">
-                <h2 id="listHeading">内容列表</h2>
-                <div class="action-row">
-                    <button id="createBtn" class="btn primary">新增内容</button>
-                    <button id="importBtn" class="btn">导入</button>
-                    <button id="exportBtn" class="btn">导出</button>
-                    <button id="clearAllBtn" class="btn danger">删除全部</button>
+<main class="container app-main">
+    <section class="panel controls-panel" aria-label="全局检索">
+        <div class="controls-grid">
+            <div class="control-item category-control">
+                <span>内容 TAB</span>
+                <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="内容分类标签">
+                    <button class="category-tab active" type="button" role="tab" aria-selected="true" data-category="all">全部</button>
+                    <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="movie">电影</button>
+                    <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="series">剧集</button>
+                    <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="anime">番剧</button>
+                    <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="game">游戏</button>
+                    <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="music">音乐</button>
                 </div>
             </div>
-            <input id="importFileInput" type="file" accept="application/json" class="hidden">
-            <p id="listStatus" class="status" role="status" aria-live="polite"></p>
-            <div id="cardGrid" class="card-grid"></div>
-        </section>
+            <label class="control-item">
+                <span>全局搜索</span>
+                <input id="searchInput" type="search" placeholder="按标题、标签、平台、演员、剧情搜索">
+            </label>
+            <label class="control-item">
+                <span>排序</span>
+                <select id="sortBy">
+                    <option value="updatedAt">最近更新</option>
+                    <option value="title">标题 A-Z</option>
+                    <option value="rating">评分高到低</option>
+                </select>
+            </label>
+        </div>
+    </section>
 
-        <section id="detailView" class="view panel hidden" aria-labelledby="detailHeading">
-            <div class="view-head">
-                <h2 id="detailHeading">详情</h2>
-                <div class="action-row">
-                    <button id="editBtn" class="btn">编辑</button>
-                    <button id="deleteBtn" class="btn danger">删除</button>
-                    <button class="btn ghost" data-view="listView">返回列表</button>
-                </div>
+    <section id="listView" class="view panel" aria-labelledby="listHeading">
+        <div class="view-head">
+            <h2 id="listHeading">内容列表</h2>
+            <div class="action-row">
+                <button id="createBtn" class="btn primary">新增内容</button>
+                <button id="importBtn" class="btn">导入</button>
+                <button id="exportBtn" class="btn">导出</button>
+                <button id="clearAllBtn" class="btn danger">删除全部</button>
             </div>
-            <div id="detailContent" class="detail-content"></div>
-        </section>
+        </div>
+        <input id="importFileInput" type="file" accept="application/json" class="hidden">
+        <p id="listStatus" class="status" role="status" aria-live="polite"></p>
+        <div id="cardGrid" class="card-grid"></div>
+    </section>
 
-        <section id="editorView" class="view panel hidden" aria-labelledby="editorHeading">
-            <div class="view-head">
-                <h2 id="editorHeading">新增 / 编辑内容</h2>
+    <section id="detailView" class="view panel hidden" aria-labelledby="detailHeading">
+        <div class="view-head">
+            <h2 id="detailHeading">详情</h2>
+            <div class="action-row">
+                <button id="editBtn" class="btn">编辑</button>
+                <button id="deleteBtn" class="btn danger">删除</button>
                 <button class="btn ghost" data-view="listView">返回列表</button>
             </div>
-
-            <form id="entryForm" class="entry-form" novalidate>
-                <input type="hidden" id="entryId">
-                <div class="form-grid">
-                    <label>
-                        <span>分类 *</span>
-                        <select id="entryCategory" required>
-                            <option value="">请选择</option>
-                            <option value="computer">电脑</option>
-                            <option value="tv">电视剧</option>
-                            <option value="anime">番剧</option>
-                            <option value="music">音乐</option>
-                            <option value="game">游戏</option>
-                        </select>
-                    </label>
-                    <label>
-                        <span>标题 *</span>
-                        <input id="entryTitle" type="text" maxlength="80" required>
-                    </label>
-                    <label>
-                        <span>评分（1-10）</span>
-                        <input id="entryRating" type="number" min="1" max="10" step="0.1" placeholder="例如 8.5">
-                    </label>
-                    <label>
-                        <span>年份</span>
-                        <input id="entryYear" type="number" min="1900" max="2100" placeholder="例如 2024">
-                    </label>
-                    <label>
-                        <span>平台 / 品牌</span>
-                        <input id="entryPlatform" type="text" maxlength="60" placeholder="例如 Steam、Netflix、Apple">
-                    </label>
-                    <label>
-                        <span>标签（逗号分隔）</span>
-                        <input id="entryTags" type="text" maxlength="120" placeholder="例如 剧情,科幻,经典">
-                    </label>
-                </div>
-
-                <label>
-                    <span>简介 / 备注</span>
-                    <textarea id="entryDescription" maxlength="800" rows="4" placeholder="写点想记录的内容..."></textarea>
-                </label>
-
-                <section id="imdbSection" class="imdb-section hidden" aria-labelledby="imdbHeading">
-                    <h3 id="imdbHeading">TMDB / IMDb 自动匹配（电视剧/番剧）</h3>
-                    <div class="imdb-search-row">
-                        <input id="imdbTitle" type="text" placeholder="输入片名自动匹配">
-                        <input id="imdbYear" type="number" min="1900" max="2100" placeholder="年份（可选）">
-                        <button id="imdbSearchBtn" type="button" class="btn">自动匹配</button>
-                    </div>
-                    <p id="imdbStatus" class="status" role="status" aria-live="polite"></p>
-                    <ul id="imdbResults" class="imdb-results"></ul>
-                </section>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn primary">保存</button>
-                    <button id="resetBtn" type="reset" class="btn ghost">重置</button>
-                </div>
-            </form>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>© <span id="year"></span> 多内容记录站 · 前端 MVP（本地数据 + TMDB/IMDb 匹配 + 导入导出）</p>
         </div>
-    </footer>
+        <div id="detailContent" class="detail-content"></div>
+    </section>
 
-    <script src="script.js"></script>
+    <section id="episodeView" class="view panel hidden" aria-labelledby="episodeHeading">
+        <div class="view-head">
+            <h2 id="episodeHeading">剧集页面</h2>
+            <button class="btn ghost" data-view="detailView">返回详情</button>
+        </div>
+        <div id="episodeContent" class="detail-content"></div>
+    </section>
+
+    <section id="editorView" class="view panel hidden" aria-labelledby="editorHeading">
+        <div class="view-head">
+            <h2 id="editorHeading">新增 / 编辑内容</h2>
+            <button class="btn ghost" data-view="listView">返回列表</button>
+        </div>
+
+        <form id="entryForm" class="entry-form" novalidate>
+            <input type="hidden" id="entryId">
+            <div class="form-grid">
+                <label>
+                    <span>分类 *</span>
+                    <select id="entryCategory" required>
+                        <option value="">请选择</option>
+                        <option value="movie">电影</option>
+                        <option value="series">剧集</option>
+                        <option value="anime">番剧</option>
+                        <option value="game">游戏</option>
+                        <option value="music">音乐</option>
+                    </select>
+                </label>
+                <label>
+                    <span>标题 *</span>
+                    <input id="entryTitle" type="text" maxlength="120" required>
+                </label>
+                <label>
+                    <span>评分（1-10）</span>
+                    <input id="entryRating" type="number" min="1" max="10" step="0.1" placeholder="例如 8.5">
+                </label>
+                <label>
+                    <span>年份</span>
+                    <input id="entryYear" type="number" min="1900" max="2100" placeholder="例如 2026">
+                </label>
+                <label>
+                    <span>平台 / 来源</span>
+                    <input id="entryPlatform" type="text" maxlength="80" placeholder="例如 TMDB / Steam / 网易云">
+                </label>
+                <label>
+                    <span>标签（逗号分隔）</span>
+                    <input id="entryTags" type="text" maxlength="160" placeholder="例如 科幻,动作,追更">
+                </label>
+            </div>
+
+            <label>
+                <span>简介 / 备注</span>
+                <textarea id="entryDescription" maxlength="2000" rows="4" placeholder="写下记录内容..."></textarea>
+            </label>
+
+            <section id="tmdbSection" class="data-section hidden" aria-labelledby="tmdbHeading">
+                <h3 id="tmdbHeading">TMDB 自动匹配（电影/剧集/番剧）</h3>
+                <div class="imdb-search-row">
+                    <input id="mediaTitle" type="text" placeholder="输入标题（支持中文匹配）">
+                    <input id="mediaYear" type="number" min="1900" max="2100" placeholder="年份（可选）">
+                    <button id="mediaSearchBtn" type="button" class="btn">自动匹配</button>
+                </div>
+                <p id="mediaStatus" class="status" role="status" aria-live="polite"></p>
+                <ul id="mediaResults" class="imdb-results"></ul>
+            </section>
+
+            <section id="steamSection" class="data-section hidden" aria-labelledby="steamHeading">
+                <h3 id="steamHeading">Steam 抓取（游戏）</h3>
+                <div class="imdb-search-row">
+                    <input id="steamAppId" type="number" min="1" placeholder="Steam AppID">
+                    <div></div>
+                    <button id="steamFetchBtn" type="button" class="btn">抓取 Steam</button>
+                </div>
+                <p id="steamStatus" class="status" role="status" aria-live="polite"></p>
+            </section>
+
+            <section id="musicSection" class="data-section hidden" aria-labelledby="musicHeading">
+                <h3 id="musicHeading">网易云批量导入（音乐）</h3>
+                <p class="hint">每行一条，格式：歌名 - 歌手</p>
+                <textarea id="musicBulkInput" rows="6" placeholder="夜曲 - 周杰伦\n稻香 - 周杰伦"></textarea>
+                <div class="action-row">
+                    <button id="musicBulkImportBtn" type="button" class="btn">批量导入</button>
+                </div>
+                <p id="musicStatus" class="status" role="status" aria-live="polite"></p>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="btn primary">保存</button>
+                <button id="resetBtn" type="reset" class="btn ghost">重置</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="subscriptionView" class="view panel hidden" aria-labelledby="subscriptionHeading">
+        <div class="view-head">
+            <h2 id="subscriptionHeading">RSS 订阅中心（追番）</h2>
+            <button class="btn ghost" data-view="listView">返回列表</button>
+        </div>
+        <div class="sub-grid">
+            <label>
+                <span>订阅名称</span>
+                <input id="rssTitle" type="text" maxlength="120" placeholder="例如 2026 春季番更新">
+            </label>
+            <label>
+                <span>RSS 地址</span>
+                <input id="rssUrl" type="url" placeholder="https://example.com/feed.xml">
+            </label>
+            <div class="action-row">
+                <button id="addRssBtn" class="btn primary" type="button">添加订阅</button>
+                <button id="refreshRssBtn" class="btn" type="button">刷新订阅</button>
+            </div>
+        </div>
+        <p id="rssStatus" class="status" role="status" aria-live="polite"></p>
+        <ul id="rssList" class="imdb-results"></ul>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <p>© <span id="year"></span> 多内容追踪站 · TMDB + Steam + RSS + 网易云导入</p>
+    </div>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
