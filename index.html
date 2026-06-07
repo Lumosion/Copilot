@@ -3,172 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="周边美食发现 - 发现你身边的美味">
-    <meta name="keywords" content="美食,餐厅,周边美食,美食推荐,转盘">
-    <title>周边美食发现</title>
+    <meta name="description" content="多内容记录站 - 记录电脑、电视剧、番剧、音乐和游戏">
+    <meta name="keywords" content="内容记录,电脑,电视剧,番剧,音乐,游戏,IMDb">
+    <title>多内容记录站</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="main-nav">
-        <div class="nav-container">
-            <div class="logo">
-                <div class="logo-image">🍜 美食发现</div>
+    <header class="site-header">
+        <div class="container header-inner">
+            <div>
+                <h1 class="site-title">📚 多内容记录站</h1>
+                <p class="site-subtitle">记录你的电脑、电视剧、番剧、音乐、游戏</p>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#foods">美食列表</a></li>
-                <li><a href="#add">添加美食</a></li>
-                <li><a href="#wheel">今天吃什么</a></li>
-            </ul>
+            <nav aria-label="主导航">
+                <ul class="nav-list">
+                    <li><button class="nav-btn active" data-view="listView">列表</button></li>
+                    <li><button class="nav-btn" data-view="editorView">新增</button></li>
+                </ul>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="hero-video-bg">
-            <div class="hero-overlay"></div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-logo-container">
-                <h1 class="game-title">🍜 周边美食</h1>
-                <p class="game-subtitle">发现你身边的美味</p>
+    <main class="container app-main" id="appMain">
+        <section class="panel controls-panel" aria-label="搜索筛选">
+            <div class="controls-grid">
+                <label class="control-item">
+                    <span>分类</span>
+                    <select id="categoryFilter">
+                        <option value="all">全部</option>
+                        <option value="computer">电脑</option>
+                        <option value="tv">电视剧</option>
+                        <option value="anime">番剧</option>
+                        <option value="music">音乐</option>
+                        <option value="game">游戏</option>
+                    </select>
+                </label>
+                <label class="control-item">
+                    <span>关键词</span>
+                    <input id="searchInput" type="search" placeholder="按标题、标签、备注搜索">
+                </label>
+                <label class="control-item">
+                    <span>排序</span>
+                    <select id="sortBy">
+                        <option value="updatedAt">最近更新</option>
+                        <option value="title">标题 A-Z</option>
+                        <option value="rating">评分高到低</option>
+                    </select>
+                </label>
             </div>
-            <div class="hero-info">
-                <p class="hero-slogan">探索·品味·分享</p>
-                <p class="hero-desc">记录每一家美食店铺，让选择不再困难</p>
-            </div>
-            <div class="hero-actions">
-                <a href="#add" class="btn btn-primary">添加美食</a>
-                <a href="#wheel" class="btn btn-outline">转盘决定</a>
-            </div>
-        </div>
-        <div class="scroll-hint">
-            <span class="scroll-text">下拉查看更多</span>
-            <div class="scroll-arrow"></div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Foods List Section -->
-    <section id="foods" class="foods-section">
-        <div class="container">
-            <h2 class="section-title">美食列表</h2>
-            <p class="section-desc">浏览所有周边美食店铺</p>
-            <div class="food-filters">
-                <button class="filter-btn active" data-filter="all">全部</button>
-                <button class="filter-btn" data-filter="5">⭐⭐⭐⭐⭐</button>
-                <button class="filter-btn" data-filter="4">⭐⭐⭐⭐</button>
-                <button class="filter-btn" data-filter="3">⭐⭐⭐</button>
+        <section id="listView" class="view panel" aria-labelledby="listHeading">
+            <div class="view-head">
+                <h2 id="listHeading">内容列表</h2>
+                <button id="createBtn" class="btn primary">新增内容</button>
             </div>
-            <div class="foods-grid" id="foodsGrid">
-                <!-- Food cards will be dynamically inserted here -->
-            </div>
-        </div>
-    </section>
+            <p id="listStatus" class="status" role="status" aria-live="polite"></p>
+            <div id="cardGrid" class="card-grid"></div>
+        </section>
 
-    <!-- Add Food Section -->
-    <section id="add" class="add-food-section">
-        <div class="container">
-            <h2 class="section-title">添加美食</h2>
-            <p class="section-desc">记录新发现的美食店铺</p>
-            <div class="add-food-form">
-                <form id="foodForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="foodName">美食名称</label>
-                            <input type="text" id="foodName" placeholder="例如：川味火锅" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="shopName">店铺名称</label>
-                            <input type="text" id="shopName" placeholder="例如：老四川火锅" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="price">人均价格（元）</label>
-                            <input type="number" id="price" placeholder="例如：80" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="rating">星级评分</label>
-                            <select id="rating" required>
-                                <option value="">选择评分</option>
-                                <option value="5">⭐⭐⭐⭐⭐</option>
-                                <option value="4">⭐⭐⭐⭐</option>
-                                <option value="3">⭐⭐⭐</option>
-                                <option value="2">⭐⭐</option>
-                                <option value="1">⭐</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="distance">距离（米）</label>
-                            <input type="number" id="distance" placeholder="例如：500" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="category">类型</label>
-                            <select id="category" required>
-                                <option value="">选择类型</option>
-                                <option value="中餐">中餐</option>
-                                <option value="西餐">西餐</option>
-                                <option value="日料">日料</option>
-                                <option value="韩餐">韩餐</option>
-                                <option value="快餐">快餐</option>
-                                <option value="小吃">小吃</option>
-                                <option value="甜品">甜品</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
+        <section id="detailView" class="view panel hidden" aria-labelledby="detailHeading">
+            <div class="view-head">
+                <h2 id="detailHeading">详情</h2>
+                <div class="action-row">
+                    <button id="editBtn" class="btn">编辑</button>
+                    <button id="deleteBtn" class="btn danger">删除</button>
+                    <button class="btn ghost" data-view="listView">返回列表</button>
+                </div>
+            </div>
+            <div id="detailContent" class="detail-content"></div>
+        </section>
+
+        <section id="editorView" class="view panel hidden" aria-labelledby="editorHeading">
+            <div class="view-head">
+                <h2 id="editorHeading">新增 / 编辑内容</h2>
+                <button class="btn ghost" data-view="listView">返回列表</button>
+            </div>
+
+            <form id="entryForm" class="entry-form" novalidate>
+                <input type="hidden" id="entryId">
+                <div class="form-grid">
+                    <label>
+                        <span>分类 *</span>
+                        <select id="entryCategory" required>
+                            <option value="">请选择</option>
+                            <option value="computer">电脑</option>
+                            <option value="tv">电视剧</option>
+                            <option value="anime">番剧</option>
+                            <option value="music">音乐</option>
+                            <option value="game">游戏</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>标题 *</span>
+                        <input id="entryTitle" type="text" maxlength="80" required>
+                    </label>
+                    <label>
+                        <span>评分（1-10）</span>
+                        <input id="entryRating" type="number" min="1" max="10" step="0.1" placeholder="例如 8.5">
+                    </label>
+                    <label>
+                        <span>年份</span>
+                        <input id="entryYear" type="number" min="1900" max="2100" placeholder="例如 2024">
+                    </label>
+                    <label>
+                        <span>平台 / 品牌</span>
+                        <input id="entryPlatform" type="text" maxlength="60" placeholder="例如 Steam、Netflix、Apple">
+                    </label>
+                    <label>
+                        <span>标签（逗号分隔）</span>
+                        <input id="entryTags" type="text" maxlength="120" placeholder="例如 剧情,科幻,经典">
+                    </label>
+                </div>
+
+                <label>
+                    <span>简介 / 备注</span>
+                    <textarea id="entryDescription" maxlength="800" rows="4" placeholder="写点想记录的内容..."></textarea>
+                </label>
+
+                <section id="imdbSection" class="imdb-section hidden" aria-labelledby="imdbHeading">
+                    <h3 id="imdbHeading">IMDb 自动导入（电视剧/番剧）</h3>
+                    <div class="imdb-search-row">
+                        <input id="imdbTitle" type="text" placeholder="输入片名">
+                        <input id="imdbYear" type="number" min="1900" max="2100" placeholder="年份（可选）">
+                        <button id="imdbSearchBtn" type="button" class="btn">查询 IMDb</button>
                     </div>
-                    <button type="submit" class="btn btn-primary submit-btn">添加美食</button>
-                </form>
-            </div>
-        </div>
-    </section>
+                    <p id="imdbStatus" class="status" role="status" aria-live="polite"></p>
+                    <ul id="imdbResults" class="imdb-results"></ul>
+                </section>
 
-    <!-- Wheel Section -->
-    <section id="wheel" class="wheel-section">
-        <div class="container">
-            <h2 class="section-title">今天吃什么？</h2>
-            <p class="section-desc">让转盘帮你决定</p>
-            <div class="wheel-container">
-                <canvas id="wheelCanvas" width="500" height="500"></canvas>
-                <button id="spinBtn" class="btn btn-primary spin-btn">开始转动</button>
-                <div id="wheelResult" class="wheel-result"></div>
-            </div>
-        </div>
-    </section>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">保存</button>
+                    <button id="resetBtn" type="reset" class="btn ghost">重置</button>
+                </div>
+            </form>
+        </section>
+    </main>
 
-    <!-- Footer -->
-    <footer class="main-footer">
+    <footer class="site-footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="footer-logo">
-                        <h3>🍜 美食发现</h3>
-                        <p>发现你身边的美味</p>
-                    </div>
-                    <p class="footer-desc">记录、分享、探索周边美食</p>
-                </div>
-                <div class="footer-col">
-                    <h4>功能</h4>
-                    <ul>
-                        <li><a href="#foods">美食列表</a></li>
-                        <li><a href="#add">添加美食</a></li>
-                        <li><a href="#wheel">转盘决定</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>关于</h4>
-                    <ul>
-                        <li><a href="#">使用指南</a></li>
-                        <li><a href="#">隐私政策</a></li>
-                        <li><a href="#">联系我们</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="footer-copyright">
-                    <p>© 2026 周边美食发现. All Rights Reserved.</p>
-                    <p>本网站为美食记录和分享平台</p>
-                </div>
-            </div>
+            <p>© <span id="year"></span> 多内容记录站 · 前端 MVP（本地数据 + IMDb 导入）</p>
         </div>
     </footer>
 
