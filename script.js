@@ -1,403 +1,575 @@
-// Food Discovery App JavaScript
+const CATEGORY_LABELS = {
+    computer: '电脑',
+    tv: '电视剧',
+    anime: '番剧',
+    music: '音乐',
+    game: '游戏'
+};
 
-// Data storage
-let foods = [
+const STORAGE_KEY = 'content-tracker-v1';
+const OMDB_ENDPOINT = 'https://www.omdbapi.com/';
+const OMDB_API_KEY = 'thewdb';
+
+const defaultEntries = [
     {
-        id: 1,
-        name: '川味火锅',
-        shop: '老四川火锅店',
-        price: 80,
-        rating: 5,
-        distance: 500,
-        category: '中餐',
-        emoji: '🍲'
+        id: crypto.randomUUID(),
+        category: 'computer',
+        title: 'MacBook Pro 14',
+        rating: 8.8,
+        year: 2023,
+        platform: 'Apple',
+        tags: ['办公', '开发'],
+        description: 'M3 芯片，续航稳定。',
+        imdb: null,
+        createdAt: new Date('2026-01-01').toISOString(),
+        updatedAt: new Date('2026-01-01').toISOString()
     },
     {
-        id: 2,
-        name: '兰州拉面',
-        shop: '马子禄牛肉面',
-        price: 25,
-        rating: 4,
-        distance: 300,
-        category: '中餐',
-        emoji: '🍜'
+        id: crypto.randomUUID(),
+        category: 'tv',
+        title: 'Breaking Bad',
+        rating: 9.7,
+        year: 2008,
+        platform: 'Netflix',
+        tags: ['犯罪', '剧情'],
+        description: '节奏紧凑，角色成长非常完整。',
+        imdb: { imdbID: 'tt0903747', rating: '9.5' },
+        createdAt: new Date('2026-01-02').toISOString(),
+        updatedAt: new Date('2026-01-02').toISOString()
     },
     {
-        id: 3,
-        name: '寿司拼盘',
-        shop: '禾绿回转寿司',
-        price: 120,
-        rating: 5,
-        distance: 800,
-        category: '日料',
-        emoji: '🍣'
+        id: crypto.randomUUID(),
+        category: 'anime',
+        title: '攻壳机动队 SAC',
+        rating: 9.2,
+        year: 2002,
+        platform: 'Blu-ray',
+        tags: ['科幻', '赛博朋克'],
+        description: '哲学讨论与动作场面兼具。',
+        imdb: null,
+        createdAt: new Date('2026-01-03').toISOString(),
+        updatedAt: new Date('2026-01-03').toISOString()
     },
     {
-        id: 4,
-        name: '意大利披萨',
-        shop: 'Papa John\'s',
-        price: 60,
-        rating: 4,
-        distance: 600,
-        category: '西餐',
-        emoji: '🍕'
+        id: crypto.randomUUID(),
+        category: 'music',
+        title: 'Random Access Memories',
+        rating: 9.1,
+        year: 2013,
+        platform: 'Spotify',
+        tags: ['电子', '专辑'],
+        description: '编曲细节丰富，耐听。',
+        imdb: null,
+        createdAt: new Date('2026-01-04').toISOString(),
+        updatedAt: new Date('2026-01-04').toISOString()
     },
     {
-        id: 5,
-        name: '韩式烤肉',
-        shop: '权金城烤肉',
-        price: 100,
-        rating: 5,
-        distance: 1000,
-        category: '韩餐',
-        emoji: '🥩'
-    },
-    {
-        id: 6,
-        name: '汉堡套餐',
-        shop: '麦当劳',
-        price: 35,
-        rating: 3,
-        distance: 200,
-        category: '快餐',
-        emoji: '🍔'
+        id: crypto.randomUUID(),
+        category: 'game',
+        title: 'The Witcher 3',
+        rating: 9.6,
+        year: 2015,
+        platform: 'Steam',
+        tags: ['RPG', '开放世界'],
+        description: '支线任务质量极高。',
+        imdb: null,
+        createdAt: new Date('2026-01-05').toISOString(),
+        updatedAt: new Date('2026-01-05').toISOString()
     }
 ];
 
-// Load foods from localStorage if available
-const loadFoods = () => {
-    const savedFoods = localStorage.getItem('foods');
-    if (savedFoods) {
-        foods = JSON.parse(savedFoods);
+class ContentService {
+    constructor(storageKey) {
+        this.storageKey = storageKey;
     }
-};
 
-// Save foods to localStorage
-const saveFoods = () => {
-    localStorage.setItem('foods', JSON.stringify(foods));
-};
-
-// Calculate walking time (assume 80 meters per minute)
-const calculateWalkTime = (distance) => {
-    const minutes = Math.ceil(distance / 80);
-    return `${minutes}分钟`;
-};
-
-// Create food card HTML
-const createFoodCard = (food) => {
-    return `
-        <div class="food-card" data-rating="${food.rating}">
-            <div class="food-image">${food.emoji}</div>
-            <div class="food-info">
-                <div class="food-header">
-                    <div>
-                        <h3 class="food-name">${food.name}</h3>
-                        <p class="food-shop">${food.shop}</p>
-                    </div>
-                    <div class="food-price">¥${food.price}</div>
-                </div>
-                <div class="food-rating">${'⭐'.repeat(food.rating)}</div>
-                <div class="food-details">
-                    <div class="detail-item">
-                        <span class="detail-label">距离</span>
-                        <span class="detail-value">${food.distance}m</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">步行</span>
-                        <span class="detail-value">${calculateWalkTime(food.distance)}</span>
-                    </div>
-                </div>
-                <span class="food-category">${food.category}</span>
-            </div>
-        </div>
-    `;
-};
-
-// Display foods
-const displayFoods = (filter = 'all') => {
-    const foodsGrid = document.getElementById('foodsGrid');
-    if (!foodsGrid) return;
-    
-    let filteredFoods = foods;
-    if (filter !== 'all') {
-        filteredFoods = foods.filter(food => food.rating === parseInt(filter));
-    }
-    
-    if (filteredFoods.length === 0) {
-        foodsGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #999;">暂无美食数据，快去添加吧！</p>';
-        return;
-    }
-    
-    foodsGrid.innerHTML = filteredFoods.map(food => createFoodCard(food)).join('');
-};
-
-// Food emojis for random selection
-const foodEmojis = ['🍕', '🍔', '🍟', '🍗', '🍖', '🌭', '🥪', '🌮', '🌯', '🥙', 
-                    '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🍤', '🍙', '🥘', '🍝'];
-
-// Handle form submission
-const handleFormSubmit = (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        id: Date.now(),
-        name: document.getElementById('foodName').value,
-        shop: document.getElementById('shopName').value,
-        price: parseInt(document.getElementById('price').value),
-        rating: parseInt(document.getElementById('rating').value),
-        distance: parseInt(document.getElementById('distance').value),
-        category: document.getElementById('category').value,
-        emoji: foodEmojis[Math.floor(Math.random() * foodEmojis.length)]
-    };
-    
-    foods.push(formData);
-    saveFoods();
-    
-    // Reset form
-    document.getElementById('foodForm').reset();
-    
-    // Show success message
-    alert('美食添加成功！');
-    
-    // Refresh display
-    displayFoods();
-    
-    // Scroll to foods section
-    document.getElementById('foods').scrollIntoView({ behavior: 'smooth' });
-};
-
-// Filter functionality
-const setupFilters = () => {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filter = btn.dataset.filter;
-            displayFoods(filter);
-        });
-    });
-};
-
-// Spinning Wheel Implementation
-class SpinningWheel {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        if (!this.canvas) return;
-        
-        this.ctx = this.canvas.getContext('2d');
-        this.spinning = false;
-        this.currentRotation = 0;
-        this.targetRotation = 0;
-        this.colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
-        
-        this.drawWheel();
-    }
-    
-    drawWheel() {
-        if (!this.canvas) return;
-        
-        const centerX = this.canvas.width / 2;
-        const centerY = this.canvas.height / 2;
-        const radius = Math.min(centerX, centerY) - 10;
-        
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        if (foods.length === 0) {
-            this.ctx.fillStyle = '#666';
-            this.ctx.font = '20px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText('请先添加美食', centerX, centerY);
-            return;
+    read() {
+        const raw = localStorage.getItem(this.storageKey);
+        if (!raw) {
+            this.write(defaultEntries);
+            return [...defaultEntries];
         }
-        
-        const sliceAngle = (2 * Math.PI) / foods.length;
-        
-        foods.forEach((food, index) => {
-            const startAngle = this.currentRotation + index * sliceAngle;
-            const endAngle = startAngle + sliceAngle;
-            
-            // Draw slice
-            this.ctx.beginPath();
-            this.ctx.moveTo(centerX, centerY);
-            this.ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-            this.ctx.closePath();
-            this.ctx.fillStyle = this.colors[index % this.colors.length];
-            this.ctx.fill();
-            this.ctx.strokeStyle = '#fff';
-            this.ctx.lineWidth = 3;
-            this.ctx.stroke();
-            
-            // Draw text
-            this.ctx.save();
-            this.ctx.translate(centerX, centerY);
-            this.ctx.rotate(startAngle + sliceAngle / 2);
-            this.ctx.textAlign = 'center';
-            this.ctx.fillStyle = '#fff';
-            this.ctx.font = 'bold 16px Arial';
-            this.ctx.fillText(food.name, radius * 0.65, 0);
-            this.ctx.font = '24px Arial';
-            this.ctx.fillText(food.emoji, radius * 0.35, 5);
-            this.ctx.restore();
-        });
-        
-        // Draw center circle
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#fff';
-        this.ctx.fill();
-        this.ctx.strokeStyle = '#333';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
-        
-        // Draw pointer at top
-        this.ctx.beginPath();
-        this.ctx.moveTo(centerX, 10);
-        this.ctx.lineTo(centerX - 15, 40);
-        this.ctx.lineTo(centerX + 15, 40);
-        this.ctx.closePath();
-        this.ctx.fillStyle = '#FF6B6B';
-        this.ctx.fill();
-        this.ctx.strokeStyle = '#fff';
-        this.ctx.lineWidth = 2;
-        this.ctx.stroke();
+        try {
+            return JSON.parse(raw);
+        } catch {
+            this.write(defaultEntries);
+            return [...defaultEntries];
+        }
     }
-    
-    spin() {
-        if (this.spinning || foods.length === 0) return;
-        
-        this.spinning = true;
-        const spinBtn = document.getElementById('spinBtn');
-        if (spinBtn) spinBtn.disabled = true;
-        
-        // Random rotation (5-8 full spins plus random offset)
-        const spins = 5 + Math.random() * 3;
-        const randomOffset = Math.random() * Math.PI * 2;
-        this.targetRotation = this.currentRotation + spins * Math.PI * 2 + randomOffset;
-        
-        const duration = 3000; // 3 seconds
-        const startTime = Date.now();
-        const startRotation = this.currentRotation;
-        
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            // Easing function (ease-out)
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            
-            this.currentRotation = startRotation + (this.targetRotation - startRotation) * easeOut;
-            this.drawWheel();
-            
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                this.spinning = false;
-                if (spinBtn) spinBtn.disabled = false;
-                this.showResult();
-            }
+
+    write(items) {
+        localStorage.setItem(this.storageKey, JSON.stringify(items));
+    }
+
+    async list({ category = 'all', keyword = '', sortBy = 'updatedAt' } = {}) {
+        let items = this.read();
+        const keywordText = keyword.trim().toLowerCase();
+
+        if (category !== 'all') {
+            items = items.filter((it) => it.category === category);
+        }
+
+        if (keywordText) {
+            items = items.filter((it) => {
+                const blob = `${it.title} ${it.platform || ''} ${it.description || ''} ${(it.tags || []).join(' ')}`.toLowerCase();
+                return blob.includes(keywordText);
+            });
+        }
+
+        const sorted = [...items].sort((a, b) => {
+            if (sortBy === 'title') return a.title.localeCompare(b.title, 'zh-Hans-CN');
+            if (sortBy === 'rating') return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+            return new Date(b.updatedAt) - new Date(a.updatedAt);
+        });
+
+        return sorted;
+    }
+
+    async getById(id) {
+        return this.read().find((it) => it.id === id) || null;
+    }
+
+    async save(input) {
+        const items = this.read();
+        const now = new Date().toISOString();
+        const tags = input.tags || [];
+        const normalized = {
+            ...input,
+            tags,
+            rating: input.rating === '' || input.rating == null ? null : Number(input.rating),
+            year: input.year === '' || input.year == null ? null : Number(input.year),
+            updatedAt: now
         };
-        
-        animate();
-    }
-    
-    showResult() {
-        const normalizedRotation = this.currentRotation % (2 * Math.PI);
-        const sliceAngle = (2 * Math.PI) / foods.length;
-        
-        // The pointer is at the top (0 radians), so we need to find which slice is there
-        // Account for rotation direction
-        let selectedIndex = Math.floor(((2 * Math.PI - normalizedRotation) % (2 * Math.PI)) / sliceAngle);
-        selectedIndex = selectedIndex % foods.length;
-        
-        const selectedFood = foods[selectedIndex];
-        const resultDiv = document.getElementById('wheelResult');
-        
-        if (resultDiv && selectedFood) {
-            resultDiv.innerHTML = `
-                <div style="font-size: 48px; margin-bottom: 10px;">${selectedFood.emoji}</div>
-                <div>今天就吃：${selectedFood.name}</div>
-                <div style="font-size: 16px; margin-top: 10px;">📍 ${selectedFood.shop} - ¥${selectedFood.price}</div>
-            `;
+
+        if (!normalized.id) {
+            normalized.id = crypto.randomUUID();
+            normalized.createdAt = now;
+            items.unshift(normalized);
+        } else {
+            const index = items.findIndex((it) => it.id === normalized.id);
+            if (index >= 0) {
+                normalized.createdAt = items[index].createdAt;
+                items[index] = normalized;
+            } else {
+                normalized.createdAt = now;
+                items.unshift(normalized);
+            }
         }
+
+        this.write(items);
+        return normalized;
+    }
+
+    async remove(id) {
+        const items = this.read().filter((it) => it.id !== id);
+        this.write(items);
+    }
+
+    async searchImdb({ title, year, category }) {
+        if (!title.trim()) {
+            return { state: 'error', message: '请输入 IMDb 查询标题。', results: [] };
+        }
+
+        const params = new URLSearchParams({
+            apikey: OMDB_API_KEY,
+            s: title.trim(),
+            type: 'series'
+        });
+
+        if (year) params.set('y', String(year));
+        if (category === 'anime') params.set('genre', 'animation');
+
+        try {
+            const response = await fetch(`${OMDB_ENDPOINT}?${params.toString()}`);
+            if (!response.ok) {
+                return { state: 'network-error', message: '网络请求失败，请稍后重试。', results: [] };
+            }
+
+            const data = await response.json();
+            if (data?.Error) {
+                const lower = data.Error.toLowerCase();
+                if (lower.includes('limit')) {
+                    return { state: 'rate-limit', message: 'IMDb 查询频率受限，请稍后再试。', results: [] };
+                }
+                if (lower.includes('not found')) {
+                    return { state: 'empty', message: '未找到匹配结果。', results: [] };
+                }
+                return { state: 'error', message: `IMDb 返回错误：${data.Error}`, results: [] };
+            }
+
+            const rawResults = Array.isArray(data.Search) ? data.Search : [];
+            if (rawResults.length === 0) {
+                return { state: 'empty', message: '未找到匹配结果。', results: [] };
+            }
+
+            const results = rawResults.slice(0, 5).map((item) => ({
+                imdbID: item.imdbID,
+                title: item.Title,
+                year: Number(item.Year) || null,
+                poster: item.Poster !== 'N/A' ? item.Poster : '',
+                type: item.Type
+            }));
+
+            return {
+                state: results.length > 1 ? 'multiple' : 'single',
+                message: results.length > 1 ? '找到多个结果，请选择。' : '找到结果，可一键回填。',
+                results
+            };
+        } catch {
+            return { state: 'network-error', message: '网络异常，无法连接 IMDb。', results: [] };
+        }
+    }
+
+    async getImdbDetail(imdbID) {
+        const params = new URLSearchParams({ apikey: OMDB_API_KEY, i: imdbID, plot: 'short' });
+        const response = await fetch(`${OMDB_ENDPOINT}?${params.toString()}`);
+        if (!response.ok) throw new Error('network');
+
+        const data = await response.json();
+        if (data?.Error) throw new Error(data.Error);
+
+        return {
+            imdbID,
+            title: data.Title || '',
+            year: Number(data.Year) || null,
+            description: data.Plot || '',
+            rating: Number(data.imdbRating) || null,
+            platform: data.Production || data.Writer || '',
+            tags: [data.Genre, data.Director, data.Actors].filter(Boolean).join(', '),
+            poster: data.Poster && data.Poster !== 'N/A' ? data.Poster : ''
+        };
     }
 }
 
-// Initialize wheel
-let wheel = null;
+const service = new ContentService(STORAGE_KEY);
 
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+const state = {
+    activeView: 'listView',
+    selectedId: null,
+    imdbResults: []
+};
+
+const dom = {
+    navBtns: document.querySelectorAll('.nav-btn'),
+    viewButtons: document.querySelectorAll('[data-view]'),
+    listStatus: document.getElementById('listStatus'),
+    cardGrid: document.getElementById('cardGrid'),
+    detailContent: document.getElementById('detailContent'),
+    detailView: document.getElementById('detailView'),
+    listView: document.getElementById('listView'),
+    editorView: document.getElementById('editorView'),
+    createBtn: document.getElementById('createBtn'),
+    categoryFilter: document.getElementById('categoryFilter'),
+    searchInput: document.getElementById('searchInput'),
+    sortBy: document.getElementById('sortBy'),
+    entryForm: document.getElementById('entryForm'),
+    entryId: document.getElementById('entryId'),
+    entryCategory: document.getElementById('entryCategory'),
+    entryTitle: document.getElementById('entryTitle'),
+    entryRating: document.getElementById('entryRating'),
+    entryYear: document.getElementById('entryYear'),
+    entryPlatform: document.getElementById('entryPlatform'),
+    entryTags: document.getElementById('entryTags'),
+    entryDescription: document.getElementById('entryDescription'),
+    imdbSection: document.getElementById('imdbSection'),
+    imdbTitle: document.getElementById('imdbTitle'),
+    imdbYear: document.getElementById('imdbYear'),
+    imdbStatus: document.getElementById('imdbStatus'),
+    imdbResults: document.getElementById('imdbResults'),
+    imdbSearchBtn: document.getElementById('imdbSearchBtn'),
+    editBtn: document.getElementById('editBtn'),
+    deleteBtn: document.getElementById('deleteBtn')
+};
+
+const escapeHtml = (value = '') => value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const setStatus = (el, message, type = 'info') => {
+    if (!el) return;
+    const prefix = type === 'error' ? '⚠️ ' : type === 'success' ? '✅ ' : '';
+    el.textContent = `${prefix}${message || ''}`;
+};
+
+const switchView = (viewId) => {
+    state.activeView = viewId;
+    ['listView', 'detailView', 'editorView'].forEach((id) => {
+        document.getElementById(id)?.classList.toggle('hidden', id !== viewId);
     });
-});
+    dom.navBtns.forEach((btn) => btn.classList.toggle('active', btn.dataset.view === viewId));
+};
 
-// Navigation scroll effect
-let lastScroll = 0;
-const nav = document.querySelector('.main-nav');
+const parseTags = (value) => value
+    .split(',')
+    .map((it) => it.trim())
+    .filter(Boolean)
+    .slice(0, 10);
 
-window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll <= 0) {
-        nav.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.05)';
-    } else {
-        nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+const shouldShowImdb = (category) => category === 'tv' || category === 'anime';
+
+const clearImdbPanel = () => {
+    state.imdbResults = [];
+    if (dom.imdbResults) dom.imdbResults.innerHTML = '';
+    setStatus(dom.imdbStatus, '');
+};
+
+const renderList = async () => {
+    setStatus(dom.listStatus, '加载中...');
+    dom.cardGrid.innerHTML = '';
+
+    const items = await service.list({
+        category: dom.categoryFilter.value,
+        keyword: dom.searchInput.value,
+        sortBy: dom.sortBy.value
+    });
+
+    if (!items.length) {
+        setStatus(dom.listStatus, '暂无数据，请先新增一条记录。');
+        return;
     }
-    
-    lastScroll = currentScroll;
-});
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Load saved foods
-    loadFoods();
-    
-    // Display foods
-    displayFoods();
-    
-    // Setup filters
-    setupFilters();
-    
-    // Setup form
-    const foodForm = document.getElementById('foodForm');
-    if (foodForm) {
-        foodForm.addEventListener('submit', handleFormSubmit);
-    }
-    
-    // Initialize wheel
-    wheel = new SpinningWheel('wheelCanvas');
-    
-    // Setup spin button
-    const spinBtn = document.getElementById('spinBtn');
-    if (spinBtn) {
-        spinBtn.addEventListener('click', () => {
-            if (foods.length === 0) {
-                alert('请先添加美食再转转盘！');
-                return;
-            }
-            wheel.spin();
-        });
-    }
-});
+    setStatus(dom.listStatus, `共 ${items.length} 条记录`);
 
-// Update footer year
-const updateFooterYear = () => {
-    const yearElements = document.querySelectorAll('.footer-copyright p');
-    const currentYear = new Date().getFullYear();
-    yearElements.forEach(el => {
-        el.innerHTML = el.innerHTML.replace(/2026/g, currentYear);
+    dom.cardGrid.innerHTML = items.map((item) => `
+        <article class="card" aria-label="${escapeHtml(item.title)}">
+            <h3>${escapeHtml(item.title)}</h3>
+            <div class="card-meta">${CATEGORY_LABELS[item.category] || item.category} · ${item.year || '未知年份'} · 评分 ${item.rating ?? '-'}</div>
+            <div class="card-meta">${escapeHtml(item.platform || '未填写平台')}</div>
+            <div class="badges">${(item.tags || []).map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join('')}</div>
+            <button class="btn" type="button" data-action="view" data-id="${item.id}">查看详情</button>
+        </article>
+    `).join('');
+};
+
+const renderDetail = async () => {
+    const item = await service.getById(state.selectedId);
+    if (!item) {
+        setStatus(dom.listStatus, '记录不存在或已删除。', 'error');
+        switchView('listView');
+        await renderList();
+        return;
+    }
+
+    dom.detailContent.innerHTML = `
+        <ul class="detail-list">
+            <li><strong>分类</strong>${CATEGORY_LABELS[item.category] || '-'}</li>
+            <li><strong>标题</strong>${escapeHtml(item.title)}</li>
+            <li><strong>评分</strong>${item.rating ?? '-'}</li>
+            <li><strong>年份</strong>${item.year ?? '-'}</li>
+            <li><strong>平台</strong>${escapeHtml(item.platform || '-')}</li>
+            <li><strong>标签</strong>${(item.tags || []).map(escapeHtml).join(' / ') || '-'}</li>
+            <li><strong>简介</strong>${escapeHtml(item.description || '-')}</li>
+            <li><strong>IMDb</strong>${item.imdb?.imdbID ? `<a href="https://www.imdb.com/title/${encodeURIComponent(item.imdb.imdbID)}/" target="_blank" rel="noopener noreferrer">${escapeHtml(item.imdb.imdbID)}</a>` : '-'}</li>
+            <li><strong>更新时间</strong>${new Date(item.updatedAt).toLocaleString('zh-CN')}</li>
+        </ul>
+    `;
+};
+
+const fillForm = (item = null) => {
+    dom.entryForm.reset();
+    clearImdbPanel();
+
+    if (!item) {
+        dom.entryId.value = '';
+        dom.entryCategory.value = '';
+        dom.imdbSection.classList.add('hidden');
+        return;
+    }
+
+    dom.entryId.value = item.id;
+    dom.entryCategory.value = item.category;
+    dom.entryTitle.value = item.title || '';
+    dom.entryRating.value = item.rating ?? '';
+    dom.entryYear.value = item.year ?? '';
+    dom.entryPlatform.value = item.platform || '';
+    dom.entryTags.value = (item.tags || []).join(', ');
+    dom.entryDescription.value = item.description || '';
+    dom.imdbSection.classList.toggle('hidden', !shouldShowImdb(item.category));
+};
+
+const validateEntry = (entry) => {
+    if (!entry.category) return '请选择分类。';
+    if (!entry.title?.trim()) return '请输入标题。';
+    if (entry.rating != null && entry.rating !== '' && (Number(entry.rating) < 1 || Number(entry.rating) > 10)) {
+        return '评分范围应为 1-10。';
+    }
+    if (entry.year != null && entry.year !== '' && (Number(entry.year) < 1900 || Number(entry.year) > 2100)) {
+        return '年份范围应为 1900-2100。';
+    }
+    return '';
+};
+
+const openCreateView = () => {
+    state.selectedId = null;
+    fillForm(null);
+    switchView('editorView');
+};
+
+const openEditView = async () => {
+    if (!state.selectedId) return;
+    const item = await service.getById(state.selectedId);
+    if (!item) return;
+    fillForm(item);
+    switchView('editorView');
+};
+
+const handleImdbSearch = async () => {
+    const title = dom.imdbTitle.value.trim();
+    const year = dom.imdbYear.value;
+    const category = dom.entryCategory.value;
+
+    setStatus(dom.imdbStatus, '查询 IMDb 中...');
+    dom.imdbSearchBtn.disabled = true;
+
+    const result = await service.searchImdb({ title, year, category });
+    state.imdbResults = result.results;
+    dom.imdbSearchBtn.disabled = false;
+
+    if (result.state === 'network-error' || result.state === 'error' || result.state === 'rate-limit') {
+        dom.imdbResults.innerHTML = '';
+        setStatus(dom.imdbStatus, result.message, 'error');
+        return;
+    }
+
+    if (result.state === 'empty') {
+        dom.imdbResults.innerHTML = '';
+        setStatus(dom.imdbStatus, result.message);
+        return;
+    }
+
+    setStatus(dom.imdbStatus, result.message, 'success');
+    dom.imdbResults.innerHTML = result.results.map((item) => `
+        <li class="imdb-item">
+            <div>
+                <strong>${escapeHtml(item.title)}</strong>
+                <p>${item.year || '-'} · ${escapeHtml(item.imdbID)}</p>
+            </div>
+            <button class="btn" type="button" data-action="fill-imdb" data-imdb-id="${item.imdbID}">回填</button>
+        </li>
+    `).join('');
+};
+
+const fillFromImdb = async (imdbID) => {
+    try {
+        setStatus(dom.imdbStatus, '拉取详情中...');
+        const detail = await service.getImdbDetail(imdbID);
+
+        dom.entryTitle.value = detail.title || dom.entryTitle.value;
+        dom.entryYear.value = detail.year ?? dom.entryYear.value;
+        dom.entryDescription.value = detail.description || dom.entryDescription.value;
+        dom.entryRating.value = detail.rating ?? dom.entryRating.value;
+        dom.entryPlatform.value = detail.platform || dom.entryPlatform.value;
+
+        const mergedTags = parseTags(`${dom.entryTags.value},${detail.tags || ''}`);
+        dom.entryTags.value = mergedTags.join(', ');
+
+        dom.entryForm.dataset.imdb = JSON.stringify({ imdbID: detail.imdbID, poster: detail.poster, rating: String(detail.rating || '') });
+        setStatus(dom.imdbStatus, '已回填 IMDb 信息。', 'success');
+    } catch (error) {
+        const message = String(error.message || '').toLowerCase().includes('limit')
+            ? 'IMDb 限流，请稍后重试。'
+            : '获取 IMDb 详情失败。';
+        setStatus(dom.imdbStatus, message, 'error');
+    }
+};
+
+const setupEvents = () => {
+    dom.viewButtons.forEach((btn) => {
+        btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
+
+    dom.createBtn.addEventListener('click', openCreateView);
+
+    [dom.categoryFilter, dom.searchInput, dom.sortBy].forEach((el) => {
+        el.addEventListener('input', renderList);
+        el.addEventListener('change', renderList);
+    });
+
+    dom.cardGrid.addEventListener('click', async (event) => {
+        const target = event.target.closest('[data-action="view"]');
+        if (!target) return;
+        state.selectedId = target.dataset.id;
+        await renderDetail();
+        switchView('detailView');
+    });
+
+    dom.editBtn.addEventListener('click', openEditView);
+
+    dom.deleteBtn.addEventListener('click', async () => {
+        if (!state.selectedId) return;
+        if (!window.confirm('确认删除这条记录吗？')) return;
+        await service.remove(state.selectedId);
+        state.selectedId = null;
+        switchView('listView');
+        await renderList();
+        setStatus(dom.listStatus, '已删除记录。', 'success');
+    });
+
+    dom.entryCategory.addEventListener('change', () => {
+        const show = shouldShowImdb(dom.entryCategory.value);
+        dom.imdbSection.classList.toggle('hidden', !show);
+        if (!show) clearImdbPanel();
+    });
+
+    dom.imdbSearchBtn.addEventListener('click', handleImdbSearch);
+
+    dom.imdbResults.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-action="fill-imdb"]');
+        if (!target) return;
+        void fillFromImdb(target.dataset.imdbId);
+    });
+
+    dom.entryForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const entry = {
+            id: dom.entryId.value || null,
+            category: dom.entryCategory.value,
+            title: dom.entryTitle.value.trim(),
+            rating: dom.entryRating.value,
+            year: dom.entryYear.value,
+            platform: dom.entryPlatform.value.trim(),
+            tags: parseTags(dom.entryTags.value),
+            description: dom.entryDescription.value.trim(),
+            imdb: dom.entryForm.dataset.imdb ? JSON.parse(dom.entryForm.dataset.imdb) : null
+        };
+
+        const validationError = validateEntry(entry);
+        if (validationError) {
+            setStatus(dom.imdbStatus, validationError, 'error');
+            return;
+        }
+
+        await service.save(entry);
+        setStatus(dom.imdbStatus, '保存成功。', 'success');
+        switchView('listView');
+        await renderList();
+    });
+
+    dom.entryForm.addEventListener('reset', () => {
+        window.setTimeout(() => {
+            dom.entryId.value = '';
+            dom.entryForm.dataset.imdb = '';
+            clearImdbPanel();
+        }, 0);
     });
 };
 
-updateFooterYear();
+const runBasicFlowTests = () => {
+    const testEntry = { category: 'tv', title: 'x', rating: 8.5, year: 2024 };
+    console.assert(validateEntry(testEntry) === '', 'valid entry should pass');
+    console.assert(validateEntry({ ...testEntry, rating: 11 }) !== '', 'invalid rating should fail');
+    console.assert(parseTags('a, b ,,,c').length === 3, 'tags parser should trim and remove empty');
+};
 
-console.log('Food Discovery App loaded successfully!');
+const init = async () => {
+    document.getElementById('year').textContent = String(new Date().getFullYear());
+    setupEvents();
+    runBasicFlowTests();
+    await renderList();
+};
+
+void init();
