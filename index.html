@@ -27,17 +27,17 @@
     <main class="container app-main" id="appMain">
         <section class="panel controls-panel" aria-label="搜索筛选">
             <div class="controls-grid">
-                <label class="control-item">
+                <div class="control-item category-control">
                     <span>分类</span>
-                    <select id="categoryFilter">
-                        <option value="all">全部</option>
-                        <option value="computer">电脑</option>
-                        <option value="tv">电视剧</option>
-                        <option value="anime">番剧</option>
-                        <option value="music">音乐</option>
-                        <option value="game">游戏</option>
-                    </select>
-                </label>
+                    <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="分类标签">
+                        <button class="category-tab active" type="button" role="tab" aria-selected="true" data-category="all">全部</button>
+                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="computer">电脑</button>
+                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="tv">电视剧</button>
+                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="anime">番剧</button>
+                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="music">音乐</button>
+                        <button class="category-tab" type="button" role="tab" aria-selected="false" data-category="game">游戏</button>
+                    </div>
+                </div>
                 <label class="control-item">
                     <span>关键词</span>
                     <input id="searchInput" type="search" placeholder="按标题、标签、备注搜索">
@@ -122,11 +122,11 @@
                 </label>
 
                 <section id="imdbSection" class="imdb-section hidden" aria-labelledby="imdbHeading">
-                    <h3 id="imdbHeading">IMDb 自动导入（电视剧/番剧）</h3>
+                    <h3 id="imdbHeading">TMDB / IMDb 自动匹配（电视剧/番剧）</h3>
                     <div class="imdb-search-row">
-                        <input id="imdbTitle" type="text" placeholder="输入片名">
+                        <input id="imdbTitle" type="text" placeholder="输入片名自动匹配">
                         <input id="imdbYear" type="number" min="1900" max="2100" placeholder="年份（可选）">
-                        <button id="imdbSearchBtn" type="button" class="btn">查询 IMDb</button>
+                        <button id="imdbSearchBtn" type="button" class="btn">自动匹配</button>
                     </div>
                     <p id="imdbStatus" class="status" role="status" aria-live="polite"></p>
                     <ul id="imdbResults" class="imdb-results"></ul>
