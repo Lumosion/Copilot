@@ -56,8 +56,14 @@
         <section id="listView" class="view panel" aria-labelledby="listHeading">
             <div class="view-head">
                 <h2 id="listHeading">内容列表</h2>
-                <button id="createBtn" class="btn primary">新增内容</button>
+                <div class="action-row">
+                    <button id="createBtn" class="btn primary">新增内容</button>
+                    <button id="importBtn" class="btn">导入</button>
+                    <button id="exportBtn" class="btn">导出</button>
+                    <button id="clearAllBtn" class="btn danger">删除全部</button>
+                </div>
             </div>
+            <input id="importFileInput" type="file" accept="application/json" class="hidden">
             <p id="listStatus" class="status" role="status" aria-live="polite"></p>
             <div id="cardGrid" class="card-grid"></div>
         </section>
@@ -142,7 +148,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>© <span id="year"></span> 多内容记录站 · 前端 MVP（本地数据 + IMDb 导入）</p>
+            <p>© <span id="year"></span> 多内容记录站 · 前端 MVP（本地数据 + TMDB/IMDb 匹配 + 导入导出）</p>
         </div>
     </footer>
 

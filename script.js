@@ -5,6 +5,7 @@ const CATEGORY_LABELS = {
     music: '音乐',
     game: '游戏'
 };
+const VALID_CATEGORIES = new Set(Object.keys(CATEGORY_LABELS));
 
 const STORAGE_KEY = 'content-tracker-v1';
 const OMDB_ENDPOINT = 'https://www.omdbapi.com/';
@@ -166,6 +167,52 @@ class ContentService {
     async remove(id) {
         const items = this.read().filter((it) => it.id !== id);
         this.write(items);
+    }
+
+    async clearAll() {
+        this.write([]);
+    }
+
+    normalizeImportEntry(raw) {
+        const title = String(raw?.title || '').trim();
+        const category = VALID_CATEGORIES.has(raw?.category) ? raw.category : '';
+        if (!title || !category) return null;
+
+        const tags = Array.isArray(raw?.tags)
+            ? raw.tags.map((it) => String(it).trim()).filter(Boolean).slice(0, 10)
+            : String(raw?.tags || '').split(',').map((it) => it.trim()).filter(Boolean).slice(0, 10);
+        const normalizeDate = (value, fallback) => {
+            if (!value) return fallback;
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+        };
+        const now = new Date().toISOString();
+        const createdAt = normalizeDate(raw?.createdAt, now);
+        const updatedAt = normalizeDate(raw?.updatedAt, createdAt);
+
+        return {
+            id: String(raw?.id || crypto.randomUUID()),
+            category,
+            title,
+            rating: raw?.rating === '' || raw?.rating == null || Number.isNaN(Number(raw.rating)) ? null : Number(raw.rating),
+            year: raw?.year === '' || raw?.year == null || Number.isNaN(Number(raw.year)) ? null : Number(raw.year),
+            platform: String(raw?.platform || '').trim(),
+            tags,
+            description: String(raw?.description || '').trim(),
+            imdb: raw?.imdb && typeof raw.imdb === 'object' ? raw.imdb : null,
+            createdAt,
+            updatedAt
+        };
+    }
+
+    async importEntries(rawEntries) {
+        if (!Array.isArray(rawEntries)) throw new Error('导入文件格式错误：应为 JSON 数组。');
+        const normalized = rawEntries
+            .map((item) => this.normalizeImportEntry(item))
+            .filter(Boolean);
+        if (!normalized.length) throw new Error('导入失败：没有可用的有效记录。');
+        this.write(normalized);
+        return normalized.length;
     }
 
     async searchMediaMatch({ title, year, category }) {
@@ -331,6 +378,10 @@ const dom = {
     listView: document.getElementById('listView'),
     editorView: document.getElementById('editorView'),
     createBtn: document.getElementById('createBtn'),
+    importBtn: document.getElementById('importBtn'),
+    exportBtn: document.getElementById('exportBtn'),
+    clearAllBtn: document.getElementById('clearAllBtn'),
+    importFileInput: document.getElementById('importFileInput'),
     categoryTabs: document.querySelectorAll('.category-tab'),
     searchInput: document.getElementById('searchInput'),
     sortBy: document.getElementById('sortBy'),
@@ -538,6 +589,51 @@ const openEditView = async () => {
     switchView('editorView');
 };
 
+const exportEntries = () => {
+    const items = service.read();
+    if (!items.length) {
+        setStatus(dom.listStatus, '当前没有可导出的记录。');
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `content-export-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus(dom.listStatus, `导出成功，共 ${items.length} 条记录。`, 'success');
+};
+
+const importEntries = async (file) => {
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const count = await service.importEntries(data);
+        state.selectedId = null;
+        switchView('listView');
+        await renderList();
+        setStatus(dom.listStatus, `导入成功，共 ${count} 条记录。`, 'success');
+    } catch (error) {
+        setStatus(dom.listStatus, String(error.message || '导入失败，请检查 JSON 文件。'), 'error');
+    } finally {
+        dom.importFileInput.value = '';
+    }
+};
+
+const clearAllEntries = async () => {
+    if (!window.confirm('确认删除全部记录吗？此操作不可恢复。')) return;
+    await service.clearAll();
+    state.selectedId = null;
+    switchView('listView');
+    await renderList();
+    setStatus(dom.listStatus, '已删除全部记录。', 'success');
+};
+
 const handleImdbSearch = async () => {
     const title = dom.imdbTitle.value.trim();
     const year = dom.imdbYear.value;
@@ -611,6 +707,16 @@ const setupEvents = () => {
     });
 
     dom.createBtn.addEventListener('click', openCreateView);
+    dom.exportBtn.addEventListener('click', exportEntries);
+    dom.importBtn.addEventListener('click', () => {
+        dom.importFileInput.value = '';
+        dom.importFileInput.click();
+    });
+    dom.importFileInput.addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        await importEntries(file);
+    });
+    dom.clearAllBtn.addEventListener('click', clearAllEntries);
 
     [dom.searchInput, dom.sortBy].forEach((el) => {
         el.addEventListener('input', renderList);
