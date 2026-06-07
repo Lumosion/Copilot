@@ -5,10 +5,21 @@ const CATEGORY_LABELS = {
     music: '音乐',
     game: '游戏'
 };
+const CATEGORY_ICONS = {
+    computer: '💻',
+    tv: '📺',
+    anime: '🌸',
+    music: '🎵',
+    game: '🎮'
+};
+const VALID_CATEGORIES = new Set(Object.keys(CATEGORY_LABELS));
 
 const STORAGE_KEY = 'content-tracker-v1';
 const OMDB_ENDPOINT = 'https://www.omdbapi.com/';
 const OMDB_API_KEY = 'thewdb';
+const TMDB_ENDPOINT = 'https://api.themoviedb.org/3';
+const TMDB_IMAGE_ENDPOINT = 'https://image.tmdb.org/t/p/w342';
+const TMDB_API_KEY = '';
 
 const defaultEntries = [
     {
@@ -165,10 +176,116 @@ class ContentService {
         this.write(items);
     }
 
-    async searchImdb({ title, year, category }) {
+    async clearAll() {
+        this.write([]);
+    }
+
+    normalizeImportEntry(raw) {
+        const title = String(raw?.title || '').trim();
+        const category = VALID_CATEGORIES.has(raw?.category) ? raw.category : '';
+        if (!title || !category) return null;
+
+        const tags = Array.isArray(raw?.tags)
+            ? raw.tags.map((it) => String(it).trim()).filter(Boolean).slice(0, 10)
+            : String(raw?.tags || '').split(',').map((it) => it.trim()).filter(Boolean).slice(0, 10);
+        const normalizeDate = (value, fallback) => {
+            if (!value) return fallback;
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+        };
+        const now = new Date().toISOString();
+        const createdAt = normalizeDate(raw?.createdAt, now);
+        const updatedAt = normalizeDate(raw?.updatedAt, createdAt);
+
+        return {
+            id: String(raw?.id || crypto.randomUUID()),
+            category,
+            title,
+            rating: raw?.rating === '' || raw?.rating == null || Number.isNaN(Number(raw.rating)) ? null : Number(raw.rating),
+            year: raw?.year === '' || raw?.year == null || Number.isNaN(Number(raw.year)) ? null : Number(raw.year),
+            platform: String(raw?.platform || '').trim(),
+            tags,
+            description: String(raw?.description || '').trim(),
+            imdb: raw?.imdb && typeof raw.imdb === 'object' ? raw.imdb : null,
+            createdAt,
+            updatedAt
+        };
+    }
+
+    async importEntries(rawEntries) {
+        if (!Array.isArray(rawEntries)) throw new Error('导入文件格式错误：应为 JSON 数组。');
+        const normalized = rawEntries
+            .map((item) => this.normalizeImportEntry(item))
+            .filter(Boolean);
+        if (!normalized.length) throw new Error('导入失败：没有可用的有效记录。');
+        this.write(normalized);
+        return normalized.length;
+    }
+
+    async searchMediaMatch({ title, year, category }) {
         if (!title.trim()) {
-            return { state: 'error', message: '请输入 IMDb 查询标题。', results: [] };
+            return { state: 'error', message: '请输入影视标题。', results: [] };
         }
+
+        const [tmdbResults, imdbResults] = await Promise.all([
+            this.searchTmdb({ title, year, category }),
+            this.searchImdb({ title, year, category })
+        ]);
+
+        const merged = [];
+        const seen = new Set();
+
+        [...tmdbResults, ...imdbResults].forEach((item) => {
+            const key = `${(item.title || '').trim().toLowerCase()}|${item.year || ''}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            merged.push(item);
+        });
+
+        if (!merged.length) {
+            return { state: 'empty', message: '未找到匹配结果。', results: [] };
+        }
+
+        const sourceSet = new Set(merged.map((item) => item.source.toUpperCase()));
+        return {
+            state: merged.length > 1 ? 'multiple' : 'single',
+            message: `找到 ${merged.length} 个结果（${Array.from(sourceSet).join(' + ')}）。`,
+            results: merged.slice(0, 8)
+        };
+    }
+
+    async searchTmdb({ title, year, category }) {
+        if (!TMDB_API_KEY || !shouldShowImdb(category)) return [];
+
+        const params = new URLSearchParams({
+            api_key: TMDB_API_KEY,
+            query: title.trim(),
+            language: 'zh-CN',
+            include_adult: 'false'
+        });
+
+        if (year) params.set('first_air_date_year', String(year));
+
+        try {
+            const response = await fetch(`${TMDB_ENDPOINT}/search/tv?${params.toString()}`);
+            if (!response.ok) return [];
+            const data = await response.json();
+            const rawResults = Array.isArray(data?.results) ? data.results : [];
+            return rawResults.slice(0, 5).map((item) => ({
+                source: 'tmdb',
+                externalId: String(item.id),
+                title: item.name || '',
+                year: item.first_air_date ? Number(item.first_air_date.slice(0, 4)) || null : null,
+                poster: item.poster_path ? `${TMDB_IMAGE_ENDPOINT}${item.poster_path}` : '',
+                type: 'series'
+            }));
+        } catch {
+            return [];
+        }
+    }
+
+    async searchImdb({ title, year, category }) {
+        if (!shouldShowImdb(category)) return [];
 
         const params = new URLSearchParams({
             apikey: OMDB_API_KEY,
@@ -177,47 +294,33 @@ class ContentService {
         });
 
         if (year) params.set('y', String(year));
-        if (category === 'anime') params.set('genre', 'animation');
 
         try {
             const response = await fetch(`${OMDB_ENDPOINT}?${params.toString()}`);
-            if (!response.ok) {
-                return { state: 'network-error', message: '网络请求失败，请稍后重试。', results: [] };
-            }
+            if (!response.ok) return [];
 
             const data = await response.json();
-            if (data?.Error) {
-                const lower = data.Error.toLowerCase();
-                if (lower.includes('limit')) {
-                    return { state: 'rate-limit', message: 'IMDb 查询频率受限，请稍后再试。', results: [] };
-                }
-                if (lower.includes('not found')) {
-                    return { state: 'empty', message: '未找到匹配结果。', results: [] };
-                }
-                return { state: 'error', message: `IMDb 返回错误：${data.Error}`, results: [] };
-            }
+            if (data?.Error) return [];
 
             const rawResults = Array.isArray(data.Search) ? data.Search : [];
-            if (rawResults.length === 0) {
-                return { state: 'empty', message: '未找到匹配结果。', results: [] };
-            }
+            if (rawResults.length === 0) return [];
 
-            const results = rawResults.slice(0, 5).map((item) => ({
-                imdbID: item.imdbID,
+            return rawResults.slice(0, 5).map((item) => ({
+                source: 'imdb',
+                externalId: item.imdbID,
                 title: item.Title,
                 year: Number(item.Year) || null,
                 poster: item.Poster !== 'N/A' ? item.Poster : '',
                 type: item.Type
             }));
-
-            return {
-                state: results.length > 1 ? 'multiple' : 'single',
-                message: results.length > 1 ? '找到多个结果，请选择。' : '找到结果，可一键回填。',
-                results
-            };
         } catch {
-            return { state: 'network-error', message: '网络异常，无法连接 IMDb。', results: [] };
+            return [];
         }
+    }
+
+    async getMediaDetail(result) {
+        if (result.source === 'tmdb') return this.getTmdbDetail(result.externalId);
+        return this.getImdbDetail(result.externalId);
     }
 
     async getImdbDetail(imdbID) {
@@ -229,7 +332,8 @@ class ContentService {
         if (data?.Error) throw new Error(data.Error);
 
         return {
-            imdbID,
+            source: 'imdb',
+            externalId: imdbID,
             title: data.Title || '',
             year: Number(data.Year) || null,
             description: data.Plot || '',
@@ -239,12 +343,34 @@ class ContentService {
             poster: data.Poster && data.Poster !== 'N/A' ? data.Poster : ''
         };
     }
+
+    async getTmdbDetail(tmdbId) {
+        if (!TMDB_API_KEY) throw new Error('tmdb-api-key-missing');
+        const params = new URLSearchParams({ api_key: TMDB_API_KEY, language: 'zh-CN' });
+        const response = await fetch(`${TMDB_ENDPOINT}/tv/${encodeURIComponent(tmdbId)}?${params.toString()}`);
+        if (!response.ok) throw new Error('network');
+        const data = await response.json();
+        if (data?.success === false) throw new Error(data.status_message || 'tmdb-error');
+
+        return {
+            source: 'tmdb',
+            externalId: String(tmdbId),
+            title: data.name || '',
+            year: data.first_air_date ? Number(data.first_air_date.slice(0, 4)) || null : null,
+            description: data.overview || '',
+            rating: Number(data.vote_average) || null,
+            platform: '',
+            tags: Array.isArray(data.genres) ? data.genres.map((it) => it.name).join(', ') : '',
+            poster: data.poster_path ? `${TMDB_IMAGE_ENDPOINT}${data.poster_path}` : ''
+        };
+    }
 }
 
 const service = new ContentService(STORAGE_KEY);
 
 const state = {
     activeView: 'listView',
+    activeCategory: 'all',
     selectedId: null,
     imdbResults: []
 };
@@ -259,7 +385,11 @@ const dom = {
     listView: document.getElementById('listView'),
     editorView: document.getElementById('editorView'),
     createBtn: document.getElementById('createBtn'),
-    categoryFilter: document.getElementById('categoryFilter'),
+    importBtn: document.getElementById('importBtn'),
+    exportBtn: document.getElementById('exportBtn'),
+    clearAllBtn: document.getElementById('clearAllBtn'),
+    importFileInput: document.getElementById('importFileInput'),
+    categoryTabs: document.querySelectorAll('.category-tab'),
     searchInput: document.getElementById('searchInput'),
     sortBy: document.getElementById('sortBy'),
     entryForm: document.getElementById('entryForm'),
@@ -310,6 +440,50 @@ const parseTags = (value) => value
 
 const shouldShowImdb = (category) => category === 'tv' || category === 'anime';
 
+const getMediaMeta = (item) => item.imdb || null;
+
+const getMediaSourceLabel = (item) => {
+    const source = getMediaMeta(item)?.source || (getMediaMeta(item)?.imdbID ? 'imdb' : '');
+    if (source === 'tmdb') return 'TMDB';
+    if (source === 'imdb') return 'IMDb';
+    return '-';
+};
+
+const getMediaExternalId = (item) => getMediaMeta(item)?.externalId || getMediaMeta(item)?.imdbID || '';
+
+const getMediaLink = (item) => {
+    const source = getMediaMeta(item)?.source || (getMediaMeta(item)?.imdbID ? 'imdb' : '');
+    const externalId = getMediaExternalId(item);
+    if (!source || !externalId) return '';
+    if (source === 'tmdb') return `https://www.themoviedb.org/tv/${encodeURIComponent(externalId)}`;
+    return `https://www.imdb.com/title/${encodeURIComponent(externalId)}/`;
+};
+
+const getMediaPoster = (item) => getMediaMeta(item)?.poster || '';
+
+const buildPoster = (url, className) => {
+    if (!url) return `<div class="${className}">无封面</div>`;
+    return `<div class="${className}"><img src="${escapeHtml(url)}" alt="封面"></div>`;
+};
+
+const getCategoryFlowText = (item) => {
+    const platform = escapeHtml(item.platform || '未填写');
+    if (item.category === 'computer') return `设备品牌：${platform}`;
+    if (item.category === 'music') return `收听渠道：${platform}`;
+    if (item.category === 'game') return `游戏平台：${platform}`;
+    return `播放平台：${platform}`;
+};
+
+const setActiveCategory = (category) => {
+    state.activeCategory = category;
+    document.body.dataset.categoryTheme = category;
+    dom.categoryTabs.forEach((btn) => {
+        const active = btn.dataset.category === category;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', String(active));
+    });
+};
+
 const clearImdbPanel = () => {
     state.imdbResults = [];
     if (dom.imdbResults) dom.imdbResults.innerHTML = '';
@@ -321,7 +495,7 @@ const renderList = async () => {
     dom.cardGrid.innerHTML = '';
 
     const items = await service.list({
-        category: dom.categoryFilter.value,
+        category: state.activeCategory,
         keyword: dom.searchInput.value,
         sortBy: dom.sortBy.value
     });
@@ -334,12 +508,15 @@ const renderList = async () => {
     setStatus(dom.listStatus, `共 ${items.length} 条记录`);
 
     dom.cardGrid.innerHTML = items.map((item) => `
-        <article class="card" aria-label="${escapeHtml(item.title)}">
-            <h3>${escapeHtml(item.title)}</h3>
-            <div class="card-meta">${CATEGORY_LABELS[item.category] || item.category} · ${item.year || '未知年份'} · 评分 ${item.rating ?? '-'}</div>
-            <div class="card-meta">${escapeHtml(item.platform || '未填写平台')}</div>
-            <div class="badges">${(item.tags || []).map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join('')}</div>
-            <button class="btn" type="button" data-action="view" data-id="${item.id}">查看详情</button>
+        <article class="card card--${item.category}" aria-label="${escapeHtml(item.title)}">
+            ${buildPoster(getMediaPoster(item), 'card-poster')}
+            <div class="card-body">
+                <h3>${CATEGORY_ICONS[item.category] || '📚'} ${escapeHtml(item.title)}</h3>
+                <div class="card-meta">${CATEGORY_LABELS[item.category] || item.category} · ${item.year || '未知年份'} · 评分 ${item.rating ?? '-'}</div>
+                <div class="card-meta">${getCategoryFlowText(item)}</div>
+                <div class="badges">${(item.tags || []).map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join('')}</div>
+                <button class="btn" type="button" data-action="view" data-id="${item.id}">查看详情</button>
+            </div>
         </article>
     `).join('');
 };
@@ -362,10 +539,13 @@ const renderDetail = async () => {
             <li><strong>平台</strong>${escapeHtml(item.platform || '-')}</li>
             <li><strong>标签</strong>${(item.tags || []).map(escapeHtml).join(' / ') || '-'}</li>
             <li><strong>简介</strong>${escapeHtml(item.description || '-')}</li>
-            <li><strong>IMDb</strong>${item.imdb?.imdbID ? `<a href="https://www.imdb.com/title/${encodeURIComponent(item.imdb.imdbID)}/" target="_blank" rel="noopener noreferrer">${escapeHtml(item.imdb.imdbID)}</a>` : '-'}</li>
+            <li><strong>来源</strong>${getMediaSourceLabel(item)}</li>
+            <li><strong>媒体链接</strong>${getMediaLink(item) ? `<a href="${getMediaLink(item)}" target="_blank" rel="noopener noreferrer">${escapeHtml(getMediaExternalId(item))}</a>` : '-'}</li>
+            <li><strong>封面</strong>${getMediaPoster(item) ? `<a href="${escapeHtml(getMediaPoster(item))}" target="_blank" rel="noopener noreferrer">查看封面</a>` : '-'}</li>
             <li><strong>更新时间</strong>${new Date(item.updatedAt).toLocaleString('zh-CN')}</li>
         </ul>
     `;
+    dom.detailContent.dataset.category = item.category || '';
 };
 
 const fillForm = (item = null) => {
@@ -374,8 +554,9 @@ const fillForm = (item = null) => {
 
     if (!item) {
         dom.entryId.value = '';
-        dom.entryCategory.value = '';
-        dom.imdbSection.classList.add('hidden');
+        const defaultCategory = state.activeCategory === 'all' ? '' : state.activeCategory;
+        dom.entryCategory.value = defaultCategory;
+        dom.imdbSection.classList.toggle('hidden', !shouldShowImdb(defaultCategory));
         return;
     }
 
@@ -387,6 +568,7 @@ const fillForm = (item = null) => {
     dom.entryPlatform.value = item.platform || '';
     dom.entryTags.value = (item.tags || []).join(', ');
     dom.entryDescription.value = item.description || '';
+    dom.entryForm.dataset.imdb = item.imdb ? JSON.stringify(item.imdb) : '';
     dom.imdbSection.classList.toggle('hidden', !shouldShowImdb(item.category));
 };
 
@@ -416,19 +598,64 @@ const openEditView = async () => {
     switchView('editorView');
 };
 
+const exportEntries = () => {
+    const items = service.read();
+    if (!items.length) {
+        setStatus(dom.listStatus, '当前没有可导出的记录。');
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `content-export-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setStatus(dom.listStatus, `导出成功，共 ${items.length} 条记录。`, 'success');
+};
+
+const importEntries = async (file) => {
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const count = await service.importEntries(data);
+        state.selectedId = null;
+        switchView('listView');
+        await renderList();
+        setStatus(dom.listStatus, `导入成功，共 ${count} 条记录。`, 'success');
+    } catch (error) {
+        setStatus(dom.listStatus, String(error.message || '导入失败，请检查 JSON 文件。'), 'error');
+    } finally {
+        dom.importFileInput.value = '';
+    }
+};
+
+const clearAllEntries = async () => {
+    if (!window.confirm('确认删除全部记录吗？此操作不可恢复。')) return;
+    await service.clearAll();
+    state.selectedId = null;
+    switchView('listView');
+    await renderList();
+    setStatus(dom.listStatus, '已删除全部记录。', 'success');
+};
+
 const handleImdbSearch = async () => {
     const title = dom.imdbTitle.value.trim();
     const year = dom.imdbYear.value;
     const category = dom.entryCategory.value;
 
-    setStatus(dom.imdbStatus, '查询 IMDb 中...');
+    setStatus(dom.imdbStatus, '自动匹配 TMDB / IMDb 中...');
     dom.imdbSearchBtn.disabled = true;
 
-    const result = await service.searchImdb({ title, year, category });
+    const result = await service.searchMediaMatch({ title, year, category });
     state.imdbResults = result.results;
     dom.imdbSearchBtn.disabled = false;
 
-    if (result.state === 'network-error' || result.state === 'error' || result.state === 'rate-limit') {
+    if (result.state === 'error') {
         dom.imdbResults.innerHTML = '';
         setStatus(dom.imdbStatus, result.message, 'error');
         return;
@@ -443,19 +670,21 @@ const handleImdbSearch = async () => {
     setStatus(dom.imdbStatus, result.message, 'success');
     dom.imdbResults.innerHTML = result.results.map((item) => `
         <li class="imdb-item">
+            ${buildPoster(item.poster, 'imdb-poster')}
             <div>
+                <span class="imdb-source">${item.source.toUpperCase()}</span>
                 <strong>${escapeHtml(item.title)}</strong>
-                <p>${item.year || '-'} · ${escapeHtml(item.imdbID)}</p>
+                <p>${item.year || '-'} · ${escapeHtml(item.externalId)}</p>
             </div>
-            <button class="btn" type="button" data-action="fill-imdb" data-imdb-id="${item.imdbID}">回填</button>
+            <button class="btn" type="button" data-action="fill-imdb" data-source="${item.source}" data-external-id="${item.externalId}">回填</button>
         </li>
     `).join('');
 };
 
-const fillFromImdb = async (imdbID) => {
+const fillFromImdb = async (source, externalId) => {
     try {
         setStatus(dom.imdbStatus, '拉取详情中...');
-        const detail = await service.getImdbDetail(imdbID);
+        const detail = await service.getMediaDetail({ source, externalId });
 
         dom.entryTitle.value = detail.title || dom.entryTitle.value;
         dom.entryYear.value = detail.year ?? dom.entryYear.value;
@@ -466,12 +695,17 @@ const fillFromImdb = async (imdbID) => {
         const mergedTags = parseTags(`${dom.entryTags.value},${detail.tags || ''}`);
         dom.entryTags.value = mergedTags.join(', ');
 
-        dom.entryForm.dataset.imdb = JSON.stringify({ imdbID: detail.imdbID, poster: detail.poster, rating: String(detail.rating || '') });
-        setStatus(dom.imdbStatus, '已回填 IMDb 信息。', 'success');
+        dom.entryForm.dataset.imdb = JSON.stringify({
+            source: detail.source,
+            externalId: detail.externalId,
+            poster: detail.poster,
+            rating: String(detail.rating || '')
+        });
+        setStatus(dom.imdbStatus, `已回填 ${detail.source.toUpperCase()} 信息。`, 'success');
     } catch (error) {
-        const message = String(error.message || '').toLowerCase().includes('limit')
-            ? 'IMDb 限流，请稍后重试。'
-            : '获取 IMDb 详情失败。';
+        const message = String(error.message || '').toLowerCase().includes('tmdb-api-key-missing')
+            ? '请先在 script.js 中配置 TMDB_API_KEY。'
+            : '获取详情失败。';
         setStatus(dom.imdbStatus, message, 'error');
     }
 };
@@ -482,10 +716,27 @@ const setupEvents = () => {
     });
 
     dom.createBtn.addEventListener('click', openCreateView);
+    dom.exportBtn.addEventListener('click', exportEntries);
+    dom.importBtn.addEventListener('click', () => {
+        dom.importFileInput.value = '';
+        dom.importFileInput.click();
+    });
+    dom.importFileInput.addEventListener('change', async (event) => {
+        const file = event.target.files?.[0];
+        await importEntries(file);
+    });
+    dom.clearAllBtn.addEventListener('click', clearAllEntries);
 
-    [dom.categoryFilter, dom.searchInput, dom.sortBy].forEach((el) => {
+    [dom.searchInput, dom.sortBy].forEach((el) => {
         el.addEventListener('input', renderList);
         el.addEventListener('change', renderList);
+    });
+
+    dom.categoryTabs.forEach((tab) => {
+        tab.addEventListener('click', async () => {
+            setActiveCategory(tab.dataset.category);
+            await renderList();
+        });
     });
 
     dom.cardGrid.addEventListener('click', async (event) => {
@@ -519,7 +770,7 @@ const setupEvents = () => {
     dom.imdbResults.addEventListener('click', (event) => {
         const target = event.target.closest('[data-action="fill-imdb"]');
         if (!target) return;
-        void fillFromImdb(target.dataset.imdbId);
+        void fillFromImdb(target.dataset.source, target.dataset.externalId);
     });
 
     dom.entryForm.addEventListener('submit', async (event) => {
@@ -567,6 +818,7 @@ const runBasicFlowTests = () => {
 
 const init = async () => {
     document.getElementById('year').textContent = String(new Date().getFullYear());
+    setActiveCategory('all');
     setupEvents();
     runBasicFlowTests();
     await renderList();
