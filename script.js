@@ -5,6 +5,13 @@ const CATEGORY_LABELS = {
     music: '音乐',
     game: '游戏'
 };
+const CATEGORY_ICONS = {
+    computer: '💻',
+    tv: '📺',
+    anime: '🌸',
+    music: '🎵',
+    game: '🎮'
+};
 const VALID_CATEGORIES = new Set(Object.keys(CATEGORY_LABELS));
 
 const STORAGE_KEY = 'content-tracker-v1';
@@ -469,6 +476,7 @@ const getCategoryFlowText = (item) => {
 
 const setActiveCategory = (category) => {
     state.activeCategory = category;
+    document.body.dataset.categoryTheme = category;
     dom.categoryTabs.forEach((btn) => {
         const active = btn.dataset.category === category;
         btn.classList.toggle('active', active);
@@ -500,10 +508,10 @@ const renderList = async () => {
     setStatus(dom.listStatus, `共 ${items.length} 条记录`);
 
     dom.cardGrid.innerHTML = items.map((item) => `
-        <article class="card" aria-label="${escapeHtml(item.title)}">
+        <article class="card card--${item.category}" aria-label="${escapeHtml(item.title)}">
             ${buildPoster(getMediaPoster(item), 'card-poster')}
             <div class="card-body">
-                <h3>${escapeHtml(item.title)}</h3>
+                <h3>${CATEGORY_ICONS[item.category] || '📚'} ${escapeHtml(item.title)}</h3>
                 <div class="card-meta">${CATEGORY_LABELS[item.category] || item.category} · ${item.year || '未知年份'} · 评分 ${item.rating ?? '-'}</div>
                 <div class="card-meta">${getCategoryFlowText(item)}</div>
                 <div class="badges">${(item.tags || []).map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join('')}</div>
@@ -537,6 +545,7 @@ const renderDetail = async () => {
             <li><strong>更新时间</strong>${new Date(item.updatedAt).toLocaleString('zh-CN')}</li>
         </ul>
     `;
+    dom.detailContent.dataset.category = item.category || '';
 };
 
 const fillForm = (item = null) => {
